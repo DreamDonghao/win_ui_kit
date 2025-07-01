@@ -46,6 +46,11 @@ add_executable(GAME
         src/customizable/components/textbox.cpp
         include/customizable/components/textbox.hpp
         include/customizable/components/inputbox.hpp
+        include/core/tool.hpp
+        src/customizable/components/inputbox.cpp
+        include/customizable/components/Circle.hpp
+        include/customizable/components/ParticleBuilder.hpp
+        include/customizable/components/timepiece.hpp
 
 )
 

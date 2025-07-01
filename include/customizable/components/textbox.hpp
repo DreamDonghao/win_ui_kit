@@ -68,19 +68,19 @@ namespace sfui {
 
         /**
          * @brief 设置文本内容
-         * @param testString 新的文本内容
+         * @param textString 新的文本内容
          */
-        void setTestString(std::string testString) {
-            m_textString = std::move(testString);
-            m_text.setString(m_textString);
+        void setTestString(const sf::String& textString) {
+            m_textString = std::move(textString);
+            m_text.setString(textString);
         }
 
         /**
          * @brief 设置文本颜色
          * @param testColor 新的颜色
          */
-        void setTestColor(sf::Color testColor) {
-            m_textColor = std::move(testColor);
+        void setTestColor(const sf::Color testColor) {
+            m_textColor = testColor;
             m_text.setFillColor(m_textColor);
         }
 

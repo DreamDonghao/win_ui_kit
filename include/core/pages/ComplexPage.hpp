@@ -1,6 +1,5 @@
 #pragma once
-#include <InteractivePage.hpp>
-#include <ControlPage.hpp>
+#include <Page.hpp>
 
 namespace sfui {
     /**
@@ -8,29 +7,29 @@ namespace sfui {
      *
      * 既支持控件布局，也支持动态交互内容。
      */
-    class ComplexPage :public InteractivePage, public ControlPage {
+    class ComplexPage :public Page {
     public:
-        ComplexPage(sf::RenderWindow *p_sfml_RenderWindow):InteractivePage(p_sfml_RenderWindow),ControlPage(p_sfml_RenderWindow){}
+        explicit ComplexPage(Window *p_window):Page(p_window){}
         /**
          * @brief 析构函数
          */
-        virtual ~ComplexPage() override =default;
+        ~ComplexPage() override =default;
 
         /**
          * @brief 同时缩放控件和交互内容
          * @param ratio 缩放比例
          */
-        void zooms(const double& ratio){
-            ControlPage::zoom(ratio);
-            InteractivePage::zoom(ratio);
-        }
+        // void zooms(const double& ratio){
+        //     ControlPage::zoom(ratio);
+        //     InteractivePage::zoom(ratio);
+        // }
 
         /**
          * @brief 更新视图，分别更新控件和交互内容的视图
          */
         void updateView() override{
-            ControlPage::updateView();
-            InteractivePage::updateView();
+            c_updateView();
+            i_updateView();
         }
 
         /**
@@ -38,7 +37,7 @@ namespace sfui {
          * @return 窗口视图
          */
         sf::View getWindowView() const {
-            return InteractivePage::m_view;
+            return mi_view;
         }
 
         /**
@@ -46,7 +45,7 @@ namespace sfui {
          * @return 世界视图
          */
         sf::View getWorldView() const {
-            return ControlPage::m_view;
+            return mc_view;
         }
 
         /**
@@ -56,7 +55,7 @@ namespace sfui {
          */
         template<typename DrawObject>
         void drawForWindow(const DrawObject &drawObject ) {
-            ControlPage::draw(drawObject);
+            draw(drawObject);
         }
 
         /**
@@ -66,10 +65,45 @@ namespace sfui {
          */
         template<typename DrawObject>
         void drawForView(const DrawObject &drawObject) {
-            InteractivePage::draw(drawObject);
+            draw(drawObject);
         }
+
+        void c_updateView() {
+            mc_view.setSize(
+                static_cast<float>(mp_window->getWindowSize().x),
+                static_cast<float>(mp_window->getWindowSize().y)
+            );
+            mc_view.setCenter(
+                static_cast<float>(mp_window->getWindowSize().x) / 2,
+                static_cast<float>(mp_window->getWindowSize().y) / 2
+            );
+        }
+
+        void i_updateView() {
+            m_windowSize = mp_window->getWindowSize();
+            mi_view.setSize(
+                static_cast<float>(m_windowSize.x),
+                static_cast<float>(m_windowSize.y)
+            );
+            mi_view.setCenter(mi_x, mi_y);
+            mp_window->getSfRenderWindow().setView(mi_view);
+        }
+
+        void setViewCenter(const float &x, const float &y) {
+            mi_x = x;
+            mi_y = y;
+        }
+
+
+
     protected:
         double m_ratio = 1; ///< 当前缩放比例
+        sf::View mc_view; ///< 控件页面的视图
+        sf::View mi_view;
+        float mi_x = 0.0; ///< 视图中心x坐标
+        float mi_y = 0.0; ///< 视图中心y坐标
+        // 窗口大小
+        WindowSize m_windowSize;
     };
 
 }

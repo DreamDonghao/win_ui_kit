@@ -17,7 +17,7 @@ namespace sfui {
         /**
          * @brief 析构函数
          */
-        ~Button() {}
+        ~Button() = default;
 
         /**
          * @brief 初始化按钮
@@ -37,7 +37,7 @@ namespace sfui {
             m_textureItem.init(filepath, m_width, m_height, m_x, m_y);
             m_area.init(
                     m_x, m_y,
-                    m_x + m_width, m_y + m_height
+                    m_x + static_cast<float>( m_width), m_y +static_cast<float> (m_height)
             );
 
             return true;

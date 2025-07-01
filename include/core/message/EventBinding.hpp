@@ -60,7 +60,6 @@ namespace sfui {
     private:
         std::unordered_map<Key, Action> m_keyBindings;          ///< 键盘事件映射表
         std::unordered_map<MouseButton, Action> m_mouseBinding; ///< 鼠标按钮事件映射表
-        std::unordered_map<MouseButton, std::vector<std::pair<const Area *, Action> > > m_mouseButtonBindings;
-        ///< 鼠标按钮+区域事件映射表
+        std::unordered_map<MouseButton, std::vector<std::pair<const Area *, Action> > > m_mouseButtonBindings;///< 鼠标按钮+区域事件映射表
     };
 }

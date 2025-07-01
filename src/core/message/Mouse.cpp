@@ -13,7 +13,7 @@ namespace sfui {
     Position  Mouse::getScreenPosition() {
         return sf::Mouse::getPosition();
     }
-    Position  Mouse::getWindowPosition() {
+    Position  Mouse::getWindowPos() {
         return sf::Mouse::getPosition(*m_sf_RenderWindow_p);
     }
     Position  Mouse::getViewPosition() const {

@@ -5,7 +5,6 @@
 #include <Page.hpp>
 
 namespace sfui {
-
     /**
      * @brief 构造窗口对象，初始化窗口和屏幕参数。
      * @param width 窗口宽度。
@@ -13,7 +12,7 @@ namespace sfui {
      * @param windowState 初始窗口状态。
      */
     Window::Window(const int &width, const int &height, const WindowState &windowState)
-        :m_event(), m_windowState(windowState) {
+        : m_event(), m_windowState(windowState) {
         const sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
         m_screenSize.x = desktopMode.width;
         m_screenSize.y = desktopMode.height;
@@ -22,7 +21,7 @@ namespace sfui {
             m_sf_renderWindow.create(sf::VideoMode(width, height), "");
         } else {
             m_sf_renderWindow.create(sf::VideoMode::getDesktopMode(),
-                "", sf::Style::Fullscreen);
+                                     "", sf::Style::Fullscreen);
         }
     }
 
@@ -46,9 +45,7 @@ namespace sfui {
      * @param page 页面指针。
      */
     void Window::addPage(const Title &pageTitle, PagePtr<Page> page) {
-        m_pages[pageTitle] = move(page);
-        m_pages[pageTitle]->setWindow(this);
-        m_pages[pageTitle]->setMouseWindow(&m_sf_renderWindow);
+        m_pages[pageTitle] = std::move(page);
     }
 
     /**
@@ -61,16 +58,14 @@ namespace sfui {
         m_sf_renderWindow.setTitle(m_nowPageTitle);
         //持续更新该窗口，直到点击关闭
         while (m_sf_renderWindow.isOpen()) {
-
-            // 获取窗口消息
+            // 获取并处理窗口消息
             procesMessage();
-
-
 
             // 显示一帧的画面
             drawFrame();
         }
     }
+
     /**
      * @brief 处理窗口和页面事件，包括关闭窗口。
      */
@@ -80,15 +75,18 @@ namespace sfui {
         // 处理页面实时消息
         m_pages[m_nowPageTitle]->executeKeyPressOnce();
 
+        m_pages[m_nowPageTitle]->update();
+
         while (m_sf_renderWindow.pollEvent(m_event)) {
             // 处理窗口事件消息
             handleEventInput();
             // 处理页面事件消息
             m_pages[m_nowPageTitle]->executeEventBinding(m_event);
             // 更新界面内容
-            m_pages[m_nowPageTitle]->update();
+            m_pages[m_nowPageTitle]->updateByMessage();
         }
     }
+
     /**
      * @brief 处理窗口事件（如关闭、F11切换全屏）。
      */
@@ -101,11 +99,11 @@ namespace sfui {
             }
         }
     }
+
     /**
      * @brief 处理实时输入（当前未实现）。
      */
     void Window::handleRealTimeInput() {
-
     }
 
     /**
@@ -118,7 +116,6 @@ namespace sfui {
         // 显示当前窗口的画面
         m_sf_renderWindow.display();
         m_sf_renderWindow.clear(m_pages[m_nowPageTitle]->getBackgroundColor());
-
     }
 
     /**
@@ -158,6 +155,7 @@ namespace sfui {
         //return m_windowSize;
         return m_sf_renderWindow.getSize();
     }
+
     /**
      * @brief 获取屏幕分辨率。
      * @return 屏幕分辨率引用。
@@ -165,6 +163,7 @@ namespace sfui {
     const WindowSize &Window::getScreenSize() const {
         return m_screenSize;
     }
+
     /**
      * @brief 更新当前页面的视图。
      */
@@ -194,7 +193,7 @@ namespace sfui {
         m_windowState = WindowState::Fullscreen;
         m_windowSize = m_sf_renderWindow.getSize();
         m_sf_renderWindow.create(sf::VideoMode::getDesktopMode(),
-            "", sf::Style::Fullscreen);
+                                 "", sf::Style::Fullscreen);
         m_sf_renderWindow.setVerticalSyncEnabled(m_verticalSyncEnabled);
         m_sf_renderWindow.setFramerateLimit(m_framerateLimit);
     }

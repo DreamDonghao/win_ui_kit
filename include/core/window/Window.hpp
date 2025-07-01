@@ -11,7 +11,13 @@ namespace sfui {
     template<typename PageType>
     using PagePtr = std::unique_ptr<PageType>;
 
-    /**
+
+
+    template<typename PageType>
+    inline PagePtr<PageType>makePage() {
+        return std::make_unique<PageType>();
+    }
+/**
      * @brief 创建一个新的页面实例。
      * @tparam PageType 页面类型。
      * @tparam Args 构造参数类型。

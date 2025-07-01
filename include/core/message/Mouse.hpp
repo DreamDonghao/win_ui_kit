@@ -30,7 +30,7 @@ namespace sfui {
          * @brief 获取鼠标指针相对于窗口的位置
          * @return 鼠标窗口坐标
          */
-        Position getWindowPosition();
+        Position getWindowPos();
 
         /**
          * @brief 获取鼠标指针相对于视图的位置

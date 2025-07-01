@@ -10,39 +10,39 @@ namespace sfui {
      */
     class InteractivePage :virtual public Page {
     public:
-        InteractivePage(sf::RenderWindow *p_sfml_RenderWindow):Page(p_sfml_RenderWindow){}
+        explicit InteractivePage(Window *mp_window):Page(mp_window){}
     protected:
-        sf::View m_view; ///< 交互页面的视图
+        //sf::View m_view; ///< 交互页面的视图
 
         /**
          * @brief 按比例缩放视图
          * @param ratio 缩放比例
          */
-        virtual void zoom(const double &ratio) {
+        virtual void zoom(const float &ratio) {
             m_view.zoom(ratio);
         }
 
         /**
          * @brief 根据绑定窗口的实时状态来更新界面视图
          */
-        void updateView() override {
-            m_windowSize = mp_window->getWindowSize();
-            m_view.setSize(
-                static_cast<float>(m_windowSize.x),
-                static_cast<float>(m_windowSize.y)
-            );
-            m_view.setCenter(m_x, m_y);
-        }
+        // void updateView() override {
+        //     m_windowSize = mp_window->getWindowSize();
+        //     m_view.setSize(
+        //         static_cast<float>(m_windowSize.x),
+        //         static_cast<float>(m_windowSize.y)
+        //     );
+        //     m_view.setCenter(m_x, m_y);
+        // }
 
         /**
          * @brief 设置视图中心坐标（世界坐标系）
          * @param x 中心x坐标
          * @param y 中心y坐标
          */
-        void setViewCenter(const float &x, const float &y) {
-            m_x = x;
-            m_y = y;
-        }
+        // void setViewCenter(const float &x, const float &y) {
+        //     m_x = x;
+        //     m_y = y;
+        // }
 
         /**
          * @brief 绘制按钮
@@ -118,9 +118,9 @@ namespace sfui {
             return m_windowSize;
         }
     private:
-        float m_x = 0.0; ///< 视图中心x坐标
-        float m_y = 0.0; ///< 视图中心y坐标
-        // 窗口大小
-        WindowSize m_windowSize;
+        // float m_x = 0.0; ///< 视图中心x坐标
+        // float m_y = 0.0; ///< 视图中心y坐标
+        // // 窗口大小
+        // WindowSize m_windowSize;
     };
 }

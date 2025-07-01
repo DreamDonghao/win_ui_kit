@@ -5,6 +5,7 @@
 #include <textbox.hpp>
 #include <EventBinding.hpp>
 #include <inputbox.hpp>
+
 namespace sfui {
     /**
      * @brief 标题类型，使用宽字符串
@@ -16,17 +17,18 @@ namespace sfui {
      * @param str 输入的字符串
      * @return 转换后的宽字符串
      */
-    Title TitleName(const std::string &str);
+    Title strToWstr(const std::string &str);
 
     using viewSize = sf::Vector2f; ///< 视图大小类型
-    class Window; ///< 前置声明窗口类
+    class Window;                  ///< 前置声明窗口类
 
     /**
      * @brief 界面抽象基类，定义界面生命周期、事件绑定、渲染等接口
      */
     class Page {
     public:
-        Page(sf::RenderWindow *p_sfml_RenderWindow):m_mouse(p_sfml_RenderWindow){}
+        explicit Page(Window *mp_window);
+
         /**
          * @brief 虚析构函数
          */
@@ -36,18 +38,6 @@ namespace sfui {
          * @brief 更新界面一帧（更新视图并渲染）
          */
         void updateFrame();
-
-        /**
-         * @brief 绑定界面与所属窗口
-         * @param p_window 窗口指针
-         */
-        void setWindow(Window *p_window);
-
-        /**
-         * @brief 为界面鼠标绑定窗口
-         * @param p_sfml_RenderWindow SFML窗口指针
-         */
-        void setMouseWindow(sf::RenderWindow *p_sfml_RenderWindow);
 
         /**
          * @brief 初始化界面（元素和消息绑定）
@@ -114,6 +104,8 @@ namespace sfui {
          */
         virtual void update() = 0;
 
+        virtual void updateByMessage() = 0;
+
         /**
          * @brief 获取界面背景颜色
          * @return 背景颜色
@@ -121,11 +113,11 @@ namespace sfui {
         [[nodiscard]] sf::Color getBackgroundColor() const;
 
     protected:
-        Window *mp_window = nullptr; ///< 界面绑定的窗口
-        sf::Color m_backgroundColor; ///< 界面背景颜色
-        Mouse m_mouse; ///< 鼠标对象
+        Window *mp_window = nullptr;         ///< 界面绑定的窗口
+        sf::Color m_backgroundColor;         ///< 界面背景颜色
+        Mouse m_mouse;                       ///< 鼠标对象
         ActiveKeyBinding m_activeKeyBinding; ///< 按键事件绑定
-        EvectBingding m_eventBinding; ///< 消息事件绑定
+        EvectBingding m_eventBinding;        // 消息事件绑定
 
         /**
          * @brief 设置界面背景颜色

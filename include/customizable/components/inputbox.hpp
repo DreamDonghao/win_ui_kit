@@ -1,86 +1,89 @@
-//
-// Created by donghao on 25-6-8.
-//
+/**
+ * @file inputbox.hpp
+ * @brief 定义 sfui::InputBox 类，用于图形化输入框组件，支持中文输入法交互。
+ * @author donghao
+ * @date 2025-06-08
+ */
 
 #ifndef INPUTBOX_HPP
 #define INPUTBOX_HPP
+
 #include <textbox.hpp>
 #include <area.hpp>
-#include <iostream>
-#include <print>
+#include <windows.h>
+#include "tool.hpp"
+#include <Mouse.hpp>
+#pragma comment(lib, "imm32.lib")
 
 namespace sfui {
+
+    /**
+     * @class InputBox
+     * @brief 一个支持中文输入法定位的输入框类，基于 SFML 和 Windows IME API。
+     *
+     * 支持文字插入、删除、光标控制，中文输入法位置跟随光标自动调整。
+     */
     class InputBox {
     public:
-        InputBox(Mouse &mouse, const float x, const float y, const int width, const int height, const sf::Color color,
-            const unsigned int textSize)
-            : m_x(x), m_y(y), m_width(width), m_height(height), m_textbox(
-                  m_x, m_y, textSize, color,
-                  R"(C:\Users\donghao\AppData\Local\Programs\cursor\resources\app\out\media\jetbrains-mono-regular.ttf)",
-                  "hello)"), m_inputArea(x, y, x + width, y + height), m_mouse(mouse) {
-        }
+        /**
+         * @brief 构造 InputBox 输入框对象。
+         * @param mouse         鼠标引用对象，用于检测点击位置
+         * @param x             输入框左上角 x 坐标
+         * @param y             输入框左上角 y 坐标
+         * @param width         输入框宽度
+         * @param height        输入框高度
+         * @param color         字体颜色
+         * @param textSize      字体大小
+         * @param renderWindow  渲染目标窗口引用
+         */
+        InputBox(Mouse &mouse, float x, float y, int width, int height,const sf::Color& color,
+                 unsigned int textSize, sf::RenderWindow &renderWindow);
 
+        /**
+         * @brief 主事件处理函数，处理点击、中文输入、按键编辑等操作。
+         * @param event 传入的 SFML 事件对象
+         */
+        void run(const sf::Event &event);
 
-        void run(const sf::Event &event) {
-            if (m_mouse.isLeftPressed()) {
-                if (m_inputArea.isInArea(m_mouse.getWindowPosition().x, m_mouse.getWindowPosition().y)) {
-                    isActive = true;
-                    std::println("isActive");
-                } else {
-                    isActive = false;
-                }
-            }
-            if (isActive) {
-                if (event.type == sf::Event::TextEntered) {
-                    std::cout << event.text.unicode << std::endl;\
-                    std::cout << cursorPosition << std::endl;
-                    if (event.text.unicode == 8) {
-                        if (cursorPosition >= 0) {
-                            m_text.erase(m_text.begin() + cursorPosition);
-                            cursorPosition--;
-                        }
-                    } else if (event.text.unicode < 128) {
-                        m_text.insert(m_text.begin() + cursorPosition+1, static_cast<char>(event.text.unicode));
-                        cursorPosition += 1;
-                    }
-                } else if (event.type == sf::Event::KeyPressed) {
-                    if (event.key.code == sf::Keyboard::Delete && cursorPosition < static_cast<int>(m_text.length())) {
-                        m_text.erase(m_text.begin() + cursorPosition + 1);
-                    } else if (event.key.code == sf::Keyboard::Left && cursorPosition >= 0) {
-                        std::cout << "L" << cursorPosition << std::endl;
-                        cursorPosition -= 1;
-                    } else if (event.key.code == sf::Keyboard::Right && cursorPosition <  static_cast<int>(m_text.
-                                   length())-1) {
-                        std::cout << "R" << cursorPosition << std::endl;
-                        cursorPosition += 1;
-                    }
-                }
-                m_textbox.setTestString(m_text);
-            }
-        }
+        /**
+         * @brief 更新光标状态，用于闪烁效果。
+         */
+        void updateCursor();
 
-        const sfui::Area &getArea() const { return m_inputArea; }
+        /**
+         * @brief 获取输入框区域。
+         * @return 输入框的 Area 区域对象（用于碰撞检测）
+         */
+        const Area &getArea() const;
 
-        std::string &getText() { return m_text; }
+        /**
+         * @brief 获取当前输入的文字。
+         * @return 引用返回的 sf::String 输入内容
+         */
+        sf::String &getText();
 
-        const sf::Text &getSpring() const {
-            return m_textbox.getSprite();
-        }
+        /**
+         * @brief 将输入框绘制到指定窗口。
+         */
+        void draw() const;
 
     private:
-        float m_x;
-        float m_y;
-        int m_width;
-        int m_height;
-        bool isActive = false;
-        std::string m_text;
-        TextBox m_textbox;
-        Area m_inputArea;
-        int cursorPosition = -1;
-        std::string cursorStyle = "|";
-        Mouse &m_mouse;
+        sf::RenderWindow &m_renderWindow; ///< 渲染目标窗口
+        float m_x;                        ///< 输入框起始横坐标
+        float m_y;                        ///< 输入框起始纵坐标
+        int m_width;                      ///< 输入框宽度
+        int m_height;                     ///< 输入框高度
+        bool isActive = false;            ///< 当前输入框是否激活
+        sf::String m_text;                ///< 当前输入文字
+        TextBox m_textbox;                ///< TextBox 对象用于渲染文字
+        Area m_inputArea;                 ///< 用于判断鼠标是否点击输入框内
+        int cursorPosition = 0;           ///< 当前光标的位置索引
+        std::string cursorStyle = "|";    ///< 光标样式（当前未使用）
+        Mouse &m_mouse;                   ///< 鼠标引用
+        HWND hwnd;                        ///< 当前窗口句柄
+        HIMC hIMC;                        ///< 输入法上下文句柄
+        bool m_showCursor = true;         ///< 光标是否可见（用于闪烁效果）
     };
 }
 
-
-#endif //INPUTBOX_HPP
+#endif // INPUTBOX_HPP
