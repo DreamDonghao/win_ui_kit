@@ -27,6 +27,8 @@ include_directories(
         "${SFML_DIR}/include"
 
         "game/include/pages"
+
+        "include/game"
 )
 
 # 添加 SFML 的库文件路径
@@ -51,6 +53,11 @@ add_executable(GAME
         include/customizable/components/Circle.hpp
         include/customizable/components/ParticleBuilder.hpp
         include/customizable/components/timepiece.hpp
+        include/game/player.hpp
+        include/game/hitbox.hpp
+        include/game/boss.hpp
+        include/game/bullet.hpp
+        include/game/playerWithCircle.hpp
 
 )
 

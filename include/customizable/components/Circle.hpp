@@ -11,36 +11,41 @@ namespace sfui {
     class Circle {
     public:
         Circle(const float x, const float y, const float radius, const sf::Color fillColor)
-            :m_x(x),m_y(y),m_radius(radius),m_fillColor(fillColor){
-            circle.setPosition(x-radius,y-radius);
+            : m_x(x), m_y(y), m_radius(radius), m_fillColor(fillColor) {
+            circle.setPosition(x - radius, y - radius);
             circle.setRadius(radius);
             circle.setFillColor(fillColor);
         }
 
+        void setPosition(const float x, const float y) {
+            m_x = x;
+            m_y = y;
+            circle.setPosition(m_x - m_radius , m_y - m_radius );
+        }
+
         void setX(const float x) {
             m_x = x;
-            circle.setPosition(m_x,m_y);
+            circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void setY(const float y) {
             m_y = y;
-            circle.setPosition(m_x,m_y);
+            circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void moveX(const float x) {
-            m_x +=x;
-            circle.setPosition(m_x,m_y);
+            m_x += x;
+            circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void moveY(const float y) {
-            m_y +=y;
-            circle.setPosition(m_x,m_y);
+            m_y += y;
+            circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
-        float getRadius() const {return m_radius;}
-        float getX() const {return m_x;}
-        float getY() const {return m_y;}
-
+        float getRadius() const { return m_radius; }
+        float getX() const { return m_x; }
+        float getY() const { return m_y; }
 
 
         void draw(sf::RenderWindow &renderWindow) const {

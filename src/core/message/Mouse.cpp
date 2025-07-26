@@ -16,10 +16,10 @@ namespace sfui {
     Position  Mouse::getWindowPos() {
         return sf::Mouse::getPosition(*m_sf_RenderWindow_p);
     }
-    Position  Mouse::getViewPosition() const {
-        sf::Vector2i mousePosWindow = sf::Mouse::getPosition(*m_sf_RenderWindow_p);
-        sf::Vector2f mousePosView = m_sf_RenderWindow_p->mapPixelToCoords(mousePosWindow);
-        return Position(static_cast<int>(mousePosView.x), static_cast<int>(mousePosView.y));
+    sf::Vector2f  Mouse::getViewPosition() const {
+        const sf::Vector2i mousePosWindow = sf::Mouse::getPosition(*m_sf_RenderWindow_p);
+        const sf::Vector2f mousePosView = m_sf_RenderWindow_p->mapPixelToCoords(mousePosWindow);
+        return mousePosView;
     }
     bool Mouse::isLeftPressed() {
         return sf::Mouse::isButtonPressed(sf::Mouse::Left);

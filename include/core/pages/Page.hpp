@@ -7,6 +7,13 @@
 #include <inputbox.hpp>
 
 namespace sfui {
+
+    template<typename T>
+    concept Drawable = requires(T obj, sf::RenderWindow &w)
+    {
+        { obj.draw(w) } -> std::same_as<void>;
+    };
+
     /**
      * @brief 标题类型，使用宽字符串
      */
@@ -27,6 +34,8 @@ namespace sfui {
      */
     class Page {
     public:
+        using WindowSize = sf::Vector2u;
+
         explicit Page(Window *mp_window);
 
         /**
@@ -42,17 +51,7 @@ namespace sfui {
         /**
          * @brief 初始化界面（元素和消息绑定）
          */
-        void init();
-
-        /**
-         * @brief 初始化界面元素（纯虚函数，需子类实现）
-         */
-        virtual void initializePageElements() = 0;
-
-        /**
-         * @brief 初始化消息与事件绑定（纯虚函数，需子类实现）
-         */
-        virtual void initMessageBinding() = 0;
+        virtual void init() = 0;
 
         /**
          * @brief 绑定按键与行为（实时输入）
@@ -84,11 +83,6 @@ namespace sfui {
         void eventMap(sf::Mouse::Button mouseButton, const Area *area, const Action &action);
 
         /**
-         * @brief 根据窗口大小更新界面视图（纯虚函数，需子类实现）
-         */
-        virtual void updateView() = 0;
-
-        /**
          * @brief 实时输入处理（处理按键行为）
          */
         void executeKeyPressOnce();
@@ -111,6 +105,64 @@ namespace sfui {
          * @return 背景颜色
          */
         [[nodiscard]] sf::Color getBackgroundColor() const;
+        
+        /**
+         * @brief 获取窗口视图
+         * @return 窗口视图
+         */
+        sf::View getWindowView() const {
+            return m_view;
+        }
+
+        /**
+         * @brief 获取世界视图
+         * @return 世界视图
+         */
+        sf::View getWorldView() const {
+            return m_view;
+        }
+
+        // /**
+        //  * @brief 以视图为依据绘制对象
+        //  * @tparam DrawObject 可绘制对象类型
+        //  * @param drawObject 绘制对象
+        //  */
+        // template<typename DrawObject>
+        // void drawForView( DrawObject &drawObject) {
+        //     drawObject.draw(getSfRenderWindow());
+        // }
+        //
+        // template<typename DrawObject>
+        // void drawForView(const DrawObject &drawObject) {
+        //     drawObject.draw(getSfRenderWindow());
+        // }
+
+        sf::RenderWindow &getSfRenderWindow() const;
+
+        void beginDrawForView();
+
+        void beginDrawForWindow() const;
+
+        template<Drawable... DrawObjects>
+        void drawForView(DrawObjects &... drawObjects) {
+            beginDrawForView();
+            auto &window = getSfRenderWindow();
+            ((drawObjects.draw(window)), ...);
+        }
+
+        template<Drawable... DrawObjects>
+        void drawForWindow(DrawObjects &... drawObjects) {
+            beginDrawForWindow();
+            auto &window = getSfRenderWindow();
+            ((drawObjects.draw(window)), ...);
+        }
+
+        void updateView();
+
+        void setViewCenter(const float &x, const float &y) {
+            mi_x = x;
+            mi_y = y;
+        }
 
     protected:
         Window *mp_window = nullptr;         ///< 界面绑定的窗口
@@ -135,5 +187,13 @@ namespace sfui {
          * @param targetPageTitle 目标页面标题
          */
         void requestPageSwitch(const Title &targetPageTitle) const;
+
+
+        double m_ratio = 1; ///< 当前缩放比例
+        sf::View m_view;
+        float mi_x = 0.0; ///< 视图中心x坐标
+        float mi_y = 0.0; ///< 视图中心y坐标
+        // 窗口大小
+        WindowSize m_windowSize;
     };
 }

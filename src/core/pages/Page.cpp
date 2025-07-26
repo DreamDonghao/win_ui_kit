@@ -15,7 +15,7 @@ namespace sfui {
         return wstr;
     }
 
-    Page::Page(Window *mp_window):mp_window(mp_window), m_mouse(&mp_window->getSfRenderWindow()) {
+    Page::Page(Window *mp_window): mp_window(mp_window), m_mouse(&mp_window->getSfRenderWindow()) {
     }
 
     void Page::updateFrame() {
@@ -23,14 +23,6 @@ namespace sfui {
         updateView();
         // 渲染页面内容到窗口
         render();
-    }
-
-
-    void Page::init() {
-        // 初始化界面元素
-        initializePageElements();
-       
-        initMessageBinding();
     }
 
     void Page::activeMap(const Key key, const Action &action) {
@@ -42,21 +34,44 @@ namespace sfui {
     }
 
     void Page::eventMap(const MouseButton mouseButton, const Action &action) {
-        m_eventBinding.bindEvent(mouseButton,action);
+        m_eventBinding.bindEvent(mouseButton, action);
     }
+
     void Page::eventMap(const sf::Mouse::Button mouseButton, const Area *const area, const Action &action) {
         m_eventBinding.bindEvent(mouseButton, area, action);
     }
 
     void Page::executeKeyPressOnce() {
         m_activeKeyBinding.update();
-        
     }
-    void Page::executeEventBinding(const sf::Event& event) {
+
+    void Page::executeEventBinding(const sf::Event &event) {
         m_eventBinding.update(event);
     }
 
     sf::Color Page::getBackgroundColor() const { return m_backgroundColor; }
+
+    void Page::updateView() {
+        m_windowSize = mp_window->getWindowSize();
+        m_view.setSize(
+            static_cast<float>(m_windowSize.x),
+            static_cast<float>(m_windowSize.y)
+        );
+        m_view.setCenter(mi_x, mi_y);
+        mp_window->getSfRenderWindow().setView(m_view);
+    }
+
+    sf::RenderWindow &Page::getSfRenderWindow() const {
+        return mp_window->getSfRenderWindow();
+    }
+
+    void Page::beginDrawForView() {
+        updateView();
+    }
+
+    void Page::beginDrawForWindow() const {
+        mp_window->getSfRenderWindow().setView(mp_window->getSfRenderWindow().getDefaultView());
+    }
 
     void Page::setBackgroundColor(const sf::Color &backgroundColor) {
         m_backgroundColor = backgroundColor;

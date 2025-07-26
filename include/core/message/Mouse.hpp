@@ -13,12 +13,12 @@ namespace sfui {
         /**
          * @brief 构造函数
          */
-        Mouse(sf::RenderWindow *p_sfml_RenderWindow);
+        explicit Mouse(sf::RenderWindow *p_sfml_RenderWindow);
         /**
          * @brief 设置绑定的SFML窗口指针
          * @param p_sfml_RenderWindow 指向SFML窗口的指针
          */
-        void setWindow(sf::RenderWindow *const p_sfml_RenderWindow);
+        void setWindow(sf::RenderWindow *p_sfml_RenderWindow);
 
         /**
          * @brief 获取鼠标指针相对于屏幕的位置
@@ -36,7 +36,7 @@ namespace sfui {
          * @brief 获取鼠标指针相对于视图的位置
          * @return 鼠标视图坐标
          */
-        Position getViewPosition() const;
+        [[nodiscard]] sf::Vector2f getViewPosition() const;
 
         /**
          * @brief 判断鼠标左键是否按下

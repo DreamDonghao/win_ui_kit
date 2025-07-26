@@ -61,8 +61,8 @@ namespace sfui {
          * @brief 设置字体大小
          * @param testSize 字体大小
          */
-        void setTestSize(unsigned int testSize) {
-            m_textSize = std::move(testSize);
+        void setTestSize(const unsigned int testSize) {
+            m_textSize = testSize;
             m_text.setCharacterSize(m_textSize);
         }
 

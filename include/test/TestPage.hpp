@@ -1,19 +1,18 @@
 ﻿#pragma once
 
-#include <ComplexPage.hpp>
-#include <windows.h>
+#include <Page.hpp>
 #include <Circle.hpp>
-// #include <elemental.hpp>
-// #include <biology.hpp>
-// #include <world_elemental.hpp>
-// #include <player.hpp>
-#include <print>
 #include <ParticleBuilder.hpp>
 #include <thread>
 #include <iostream>
+#include <player.hpp>
+#include <bullet.hpp>
+#include <text.hpp>
+
+#include "playerWithCircle.hpp"
 
 namespace game {
-    class MainMenuPage : public sfui::ComplexPage {
+    class MainMenuPage : public sfui::Page {
     private:
         sfui::TextureItem mainPage;
 
@@ -21,28 +20,27 @@ namespace game {
         sf::String str;
         //sfui::InputBox inputbox;
 
-        sfui::ParticleBuilder particle;
-
         float angle = 0;
+
+
+        game::Player<sfui::Circle> player;
+
+        game::Barrage barrage;
+        sfui::TimeIntervalMs timeInterval;
 
     public:
         explicit MainMenuPage(sfui::Window *p_window)
-            : ComplexPage(p_window),
+            : Page(p_window),
               textBox(0, 0, 100, sf::Color::White,
-                      R"(C:\Users\donghao\AppData\Local\Programs\cursor\resources\app\out\media\jetbrains-mono-regular.ttf)",
+                      R"(zh-cn.ttf)",
                       "hello"),
-              particle(0, 0, 100, 1, std::chrono::milliseconds(5000), std::chrono::milliseconds(1), {0.1, 0.5},
-                       sf::Color::White) {
+              player(-300.f, 0.f, 100.f, 100.f, 3.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow) {
         }
 
         // 初始化界面元素
-        void initializePageElements() override {
+        void init() override {
             m_ratio = 0.5;
-            std::println("{}", m_ratio);
-        }
-
-        // 初始化消息-事件映射
-        void initMessageBinding() override {
+            //std::println("{}", m_ratio);
         }
 
 
@@ -50,6 +48,11 @@ namespace game {
         void updateByMessage() override {
             //textBox.setTestString(str);
             //inputbox.run(mp_window->getEvent());
+
+            activeMap(sfui::Key::W, [&]() { player.moveUp(); });
+            activeMap(sfui::Key::S, [&]() { player.moveDown(); });
+            activeMap(sfui::Key::A, [&]() { player.moveLift(); });
+            activeMap(sfui::Key::D, [&]() { player.moveRight(); });
         }
 
         // 执行界面逻辑
@@ -59,13 +62,13 @@ namespace game {
             //std::cout<<a.elapsed()<<std::endl;
 
             //inputbox.updateCursor();
-            particle.run();
+            //particle.run();
             // particle.setX(m_mouse.getViewPosition().x);
             // particle.setY(m_mouse.getViewPosition().y);
 
             using namespace std::chrono;
 
-            constexpr auto period = milliseconds(16); // 每 16ms 一次 ≈ 60 FPS
+            constexpr auto period = 16ms; // 每 16ms 一次 ≈ 60 FPS
             const auto start = std::chrono::steady_clock::now();
 
             // ... 你的逻辑代码，比如更新粒子、处理输入、渲染等 ...
@@ -76,25 +79,40 @@ namespace game {
             if (const auto elapsed = end - start; elapsed < period) {
                 std::this_thread::sleep_for(period - elapsed); // 等剩下的时间
             } else {
-                // 哼，超时啦，当前帧跑太久了喵~
                 std::cout << "Warning: Frame over time budget: "
                         << duration_cast<milliseconds>(elapsed).count()
                         << "ms\n";
             }
-            setViewCenter(0,0);
-            angle+=0.05;
-             particle.setX(cos(angle)*100);
-             particle.setY(sin(angle)*100);
+            setViewCenter(player.getX(), player.getY());
+            // angle+=0.05;
+            //particle.setX(player.getX());
+            //particle.setY(player.getY());
 
+            const game::Player tempPlayer(m_mouse.getViewPosition().x, m_mouse.getViewPosition().y, 6, 6, 1, 1);
+
+
+            barrage.addBullet(0, 0, 2, static_cast<float>(randomDouble(0, 2 * 3.31415926)), 50, 50, 1);
+            barrage.run();
+
+            player.changeHealth(-1 * barrage.dealDamage(player.getHitbox()));
+            textBox.setTestString(
+                std::string("HP:") + std::to_string(player.getHealth()) + "\ntime:" + std::to_string(
+                    timeInterval.elapsed() / 1000) + "s");
         }
 
         // 渲染页面内容到窗口
         void render() override {
-            mp_window->getSfRenderWindow().setView(mp_window->getSfRenderWindow().getDefaultView());
+            drawForWindow();
 
-            i_updateView();
-            particle.drow(mp_window->getSfRenderWindow());
+            mp_window->getSfRenderWindow().draw(textBox.getSprite());
+            //particle.drow(mp_window->getSfRenderWindow());
+
+            drawForView(
+                player,
+                player.getHitbox(),
+                barrage
+            );
+            barrage.drowHitbox(mp_window->getSfRenderWindow());
         }
-
     };
 }

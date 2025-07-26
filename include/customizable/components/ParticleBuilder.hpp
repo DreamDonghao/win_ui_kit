@@ -4,6 +4,7 @@
 #ifndef PARTICLEBUILDER_HPP
 #define PARTICLEBUILDER_HPP
 #include <Circle.hpp>
+#include <iostream>
 #include <tool.hpp>
 #include <SFML/Window.hpp>
 #include <timepiece.hpp>
@@ -20,6 +21,14 @@ namespace sfui {
         void move() {
             m_circle.moveX(m_speed * cosf(m_moveAngle));
             m_circle.moveY(m_speed * sinf(m_moveAngle));
+        }
+
+        float getX() const {
+            return m_circle.getX();
+        }
+
+        float getY() const {
+            return m_circle.getY();
         }
 
         void dying(const std::chrono::milliseconds time) {
@@ -52,7 +61,8 @@ namespace sfui {
     class ParticleBuilder {
     public:
         ParticleBuilder(const float x, const float y,
-                        const float ActivityRadius, const float particleSize,const std::chrono::milliseconds &existenceTime,
+                        const float ActivityRadius, const float particleSize,
+                        const std::chrono::milliseconds &existenceTime,
                         const std::chrono::milliseconds particleGenerationTimeInterval,
                         const std::pair<float, float> speedRange, const sf::Color particleColor)
             : m_x(x), m_y(y), m_ActivityRadius(ActivityRadius),
@@ -72,16 +82,21 @@ namespace sfui {
         void run() {
             if (m_particleGenerationTimeInterval) {
                 m_particles.emplace_back(
-                    m_x, m_y,m_particleSize,m_particleColor,
-                    m_particleExistenceTime,randomDouble(m_speedRange.first, m_speedRange.second),
+                    m_x, m_y, m_particleSize, m_particleColor,
+                    m_particleExistenceTime, randomDouble(m_speedRange.first, m_speedRange.second),
                     randomDouble(0, 2 * 3.14159269));
             }
+
             const auto timeInterval = m_timeIntervalMs.reset();
             for (size_t i = 0; i < m_particles.size();) {
                 auto &p = m_particles[i];
 
                 p.dying(std::chrono::milliseconds(timeInterval));
                 p.move();
+
+                if (m_ActivityRadius > 0 && distance(m_x, m_y, p.getX(), p.getY()) > m_ActivityRadius) {
+                    p.setIsAlive(false);
+                }
 
                 if (!p.isAlive()) {
                     p = m_particles.back();
