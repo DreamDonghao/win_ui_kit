@@ -48,12 +48,12 @@ namespace game {
             return m_isAlive;
         }
 
-        void drow(sf::RenderWindow &window)const {
+        void draw(sf::RenderWindow &window)const {
             const sfui::Circle circle(m_x,m_y,25,sf::Color::Red);
             circle.draw(window);
         }
 
-        void drowHitbox(sf::RenderWindow &window){
+        void drawHitbox(sf::RenderWindow &window)const{
             m_hitbox.draw(window);
         }
 
@@ -101,20 +101,22 @@ namespace game {
             }
         }
 
-        void draw(sf::RenderWindow& window) const {
-            for (const auto &bullet: m_bullets) {
-               bullet.drow(window);
-            }
+        void setIsDrawHitbox(const bool drawHitbox) {
+            m_isDrawHitbox = drawHitbox;
         }
 
-        void drowHitbox(sf::RenderWindow& window){
+        void draw(sf::RenderWindow& window) const{
             for (auto &bullet: m_bullets) {
-                bullet.drowHitbox(window);
+               bullet.draw(window);
+                if (m_isDrawHitbox) {
+                    bullet.drawHitbox(window);
+                }
             }
         }
 
     private:
         std::vector<Bullet> m_bullets;
+        bool m_isDrawHitbox{false};
     };
 } // game
 

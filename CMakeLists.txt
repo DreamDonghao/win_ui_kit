@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 23)
 project (GAME)
 
 # 设置 SFML动态库 路径
-set(SFML_DIR _library/sfml)
+set(SFML_DIR _library/SFML-2.6.1)
 
 set(SFMLUI_INCLUDE include)
 
@@ -62,13 +62,16 @@ add_executable(GAME
 )
 
 # 链接 SFML 的库
-target_link_libraries(GAME
-        sfml-audio
-        sfml-graphics
-        sfml-network
-        sfml-system
-        sfml-window
-)
+# 链接 SFML 的库（自动选择 debug / release）
+set(SFML_LIBS sfml-audio sfml-graphics sfml-network sfml-system sfml-window)
+
+foreach(lib IN LISTS SFML_LIBS)
+    target_link_libraries(GAME
+            debug ${lib}-d
+            optimized ${lib}
+    )
+endforeach()
+
 
 file(COPY ${SFML_DIR}/bin/ DESTINATION ${CMAKE_BINARY_DIR}/)
 

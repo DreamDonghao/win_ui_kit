@@ -37,7 +37,7 @@ namespace sfui {
          * @param renderWindow  渲染目标窗口引用
          */
         InputBox(Mouse &mouse, float x, float y, int width, int height,const sf::Color& color,
-                 unsigned int textSize, sf::RenderWindow &renderWindow);
+                 unsigned int textSize, const sf::RenderWindow &renderWindow);
 
         /**
          * @brief 主事件处理函数，处理点击、中文输入、按键编辑等操作。
@@ -65,10 +65,9 @@ namespace sfui {
         /**
          * @brief 将输入框绘制到指定窗口。
          */
-        void draw() const;
+        void draw(sf::RenderWindow &m_renderWindow) const;
 
     private:
-        sf::RenderWindow &m_renderWindow; ///< 渲染目标窗口
         float m_x;                        ///< 输入框起始横坐标
         float m_y;                        ///< 输入框起始纵坐标
         int m_width;                      ///< 输入框宽度

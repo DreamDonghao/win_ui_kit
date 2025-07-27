@@ -105,6 +105,11 @@ namespace sfui {
             return m_text;
         }
 
+
+        void draw(sf::RenderWindow &window) const {
+            window.draw(m_text);
+        }
+
     private:
         sf::Text m_text;              ///< SFML文本对象
         sf::Font m_font;              ///< 字体对象

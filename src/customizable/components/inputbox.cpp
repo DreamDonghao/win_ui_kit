@@ -16,12 +16,12 @@
 namespace sfui{
 
         InputBox::InputBox(Mouse &mouse, const float x, const float y, const int width, const int height, const sf::Color& color,
-                           const unsigned int textSize, sf::RenderWindow &renderWindow)
-            : m_renderWindow(renderWindow), m_x(x), m_y(y), m_width(width), m_height(height), m_textbox(
+                           const unsigned int textSize, const sf::RenderWindow &renderWindow)
+            :  m_x(x), m_y(y), m_width(width), m_height(height), m_textbox(
                   m_x, m_y, textSize, color,
                   R"(C:\Windows\Fonts\msyh.ttc)",
                   "hello)"), m_inputArea(x, y, x + width, y + height), m_mouse(mouse) {
-            hwnd = m_renderWindow.getSystemHandle();
+            hwnd = renderWindow.getSystemHandle();
             hIMC = ImmGetContext(hwnd);
             ImmAssociateContext(hwnd, hIMC);
         }
@@ -95,15 +95,15 @@ namespace sfui{
         sf::String &InputBox::getText() { return m_text; }
 
 
-        void InputBox::draw() const {
-            m_renderWindow.draw(m_textbox.getSprite());
+        void InputBox::draw(sf::RenderWindow &renderWindow) const{
+            renderWindow.draw(m_textbox.getSprite());
             if (isActive && !m_showCursor) {
                 const auto cursorPixelPos = m_textbox.getSprite().findCharacterPos(cursorPosition);
                 sf::RectangleShape cursor;
                 cursor.setSize({3.f, static_cast<float>(m_textbox.getSprite().getCharacterSize()) + 10});
                 cursor.setFillColor(sf::Color::White);
                 cursor.setPosition(cursorPixelPos);
-                m_renderWindow.draw(cursor);
+                renderWindow.draw(cursor);
             }
         }
 

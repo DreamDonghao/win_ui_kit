@@ -105,7 +105,7 @@ namespace sfui {
          * @return 背景颜色
          */
         [[nodiscard]] sf::Color getBackgroundColor() const;
-        
+
         /**
          * @brief 获取窗口视图
          * @return 窗口视图
@@ -122,20 +122,6 @@ namespace sfui {
             return m_view;
         }
 
-        // /**
-        //  * @brief 以视图为依据绘制对象
-        //  * @tparam DrawObject 可绘制对象类型
-        //  * @param drawObject 绘制对象
-        //  */
-        // template<typename DrawObject>
-        // void drawForView( DrawObject &drawObject) {
-        //     drawObject.draw(getSfRenderWindow());
-        // }
-        //
-        // template<typename DrawObject>
-        // void drawForView(const DrawObject &drawObject) {
-        //     drawObject.draw(getSfRenderWindow());
-        // }
 
         sf::RenderWindow &getSfRenderWindow() const;
 

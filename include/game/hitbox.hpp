@@ -52,7 +52,7 @@ namespace game {
             return m_height;
         }
 
-        void draw(sf::RenderWindow &window) {
+        void draw(sf::RenderWindow &window) const{
             border[0].position = sf::Vector2f(m_x - m_width / 2, m_y - m_height / 2);
             border[1].position = sf::Vector2f(m_x + m_width / 2, m_y - m_height / 2);
             border[2].position = sf::Vector2f(m_x + m_width / 2, m_y + m_height / 2);
@@ -69,7 +69,7 @@ namespace game {
         float m_y;
         float m_width;
         float m_height;
-        sf::VertexArray border{sf::LineStrip, 5};
+        mutable sf::VertexArray border{sf::LineStrip, 5};
     };
 
     inline bool isCollide(const Hitbox &a, const Hitbox &b) {

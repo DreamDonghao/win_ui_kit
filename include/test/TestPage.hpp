@@ -15,18 +15,14 @@ namespace game {
     class MainMenuPage : public sfui::Page {
     private:
         sfui::TextureItem mainPage;
-
         sfui::TextBox textBox;
         sf::String str;
         //sfui::InputBox inputbox;
-
         float angle = 0;
-
-
         game::Player<sfui::Circle> player;
-
         game::Barrage barrage;
         sfui::TimeIntervalMs timeInterval;
+        sfui::InputBox inputBox;
 
     public:
         explicit MainMenuPage(sfui::Window *p_window)
@@ -34,25 +30,26 @@ namespace game {
               textBox(0, 0, 100, sf::Color::White,
                       R"(zh-cn.ttf)",
                       "hello"),
-              player(-300.f, 0.f, 100.f, 100.f, 3.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow) {
+              player(-300.f, 0.f, 100.f, 100.f, 3.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow),
+              inputBox(m_mouse, 0, 0, 1000, 100, sf::Color::Yellow, 100, getSfRenderWindow()) {
         }
 
         // 初始化界面元素
         void init() override {
             m_ratio = 0.5;
             //std::println("{}", m_ratio);
-        }
-
-
-        //
-        void updateByMessage() override {
             //textBox.setTestString(str);
-            //inputbox.run(mp_window->getEvent());
 
             activeMap(sfui::Key::W, [&]() { player.moveUp(); });
             activeMap(sfui::Key::S, [&]() { player.moveDown(); });
             activeMap(sfui::Key::A, [&]() { player.moveLift(); });
             activeMap(sfui::Key::D, [&]() { player.moveRight(); });
+        }
+
+
+        //
+        void updateByMessage() override {
+            inputBox.run(mp_window->getEvent());
         }
 
         // 执行界面逻辑
@@ -102,17 +99,20 @@ namespace game {
 
         // 渲染页面内容到窗口
         void render() override {
-            drawForWindow();
+            drawForWindow(
+                inputBox,
+                textBox
+            );
 
-            mp_window->getSfRenderWindow().draw(textBox.getSprite());
+
             //particle.drow(mp_window->getSfRenderWindow());
 
+            barrage.setIsDrawHitbox(true);
             drawForView(
                 player,
                 player.getHitbox(),
                 barrage
             );
-            barrage.drowHitbox(mp_window->getSfRenderWindow());
         }
     };
 }
