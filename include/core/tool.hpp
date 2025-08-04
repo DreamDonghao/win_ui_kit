@@ -48,8 +48,16 @@ inline double randomDouble(const double a, const double b) {
     return dist(gen);
 }
 
+inline float distance(const float x1, const float y1, const float x2, const float y2) {
+    return sqrt( (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
+
 inline double distance(const double x1, const double y1, const double x2, const double y2) {
     return sqrt( (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
+
+inline float get_angle_radians(const float x1, const float y1, const float x2, const float y2) {
+    return std::atan2(y2-y1, x2-x1);
 }
 
 #endif //TOOL_HPP

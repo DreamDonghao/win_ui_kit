@@ -13,11 +13,26 @@ constexpr int width = 16;
 constexpr int heigth = 10;
 constexpr int ratio = 80;
 
+
+
+
+#define TEST
+
+
+
+
+
+
+
+
 int main() {
+//#define TEST
+
+#ifdef TEST
     sfui::Window window(width * ratio, heigth * ratio, sfui::WindowState::Windowed);
     window.init(165, false);
     window.addPage(sfui::strToWstr("主界面"), sfui::makePage<game::MainMenuPage>(&window));
     window.startShow(sfui::strToWstr("主界面"));
-
+#endif
     return 0;
 }

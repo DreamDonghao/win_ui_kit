@@ -70,7 +70,7 @@ namespace sfui {
          * @brief 设置文本内容
          * @param textString 新的文本内容
          */
-        void setTestString(const sf::String& textString) {
+        void setTestString(const sf::String &textString) {
             m_textString = std::move(textString);
             m_text.setString(textString);
         }
@@ -95,7 +95,7 @@ namespace sfui {
             m_text.setPosition(m_y, m_y);
         }
 
-        std::string getText()const { return m_text.getString(); }
+        std::string getText() const { return m_text.getString(); }
 
         /**
          * @brief 获取SFML文本对象（用于绘制）
@@ -111,13 +111,13 @@ namespace sfui {
         }
 
     private:
-        sf::Text m_text;              ///< SFML文本对象
-        sf::Font m_font;              ///< 字体对象
+        sf::Text m_text;             ///< SFML文本对象
+        sf::Font m_font;             ///< 字体对象
         float m_x = 0;               ///< 文本框x坐标
         float m_y = 0;               ///< 文本框y坐标
-        std::string m_textString;     ///< 文本内容
-        sf::Color m_textColor;        ///< 文本颜色
-        unsigned int m_textSize = 0;  ///< 字体大小
+        std::string m_textString;    ///< 文本内容
+        sf::Color m_textColor;       ///< 文本颜色
+        unsigned int m_textSize = 0; ///< 字体大小
     };
 }
 

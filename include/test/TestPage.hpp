@@ -7,9 +7,7 @@
 #include <iostream>
 #include <player.hpp>
 #include <bullet.hpp>
-#include <text.hpp>
-
-#include "playerWithCircle.hpp"
+#include <boss.hpp>
 
 namespace game {
     class MainMenuPage : public sfui::Page {
@@ -20,9 +18,13 @@ namespace game {
         //sfui::InputBox inputbox;
         float angle = 0;
         game::Player<sfui::Circle> player;
-        game::Barrage barrage;
+        float playerX{0}, playerY{0};
+        //game::Barrage barrage;
         sfui::TimeIntervalMs timeInterval;
         sfui::InputBox inputBox;
+        game::Boss boss;
+        sfui::Task<void> bossUpdate;
+        sfui::Circle circle;
 
     public:
         explicit MainMenuPage(sfui::Window *p_window)
@@ -30,8 +32,11 @@ namespace game {
               textBox(0, 0, 100, sf::Color::White,
                       R"(zh-cn.ttf)",
                       "hello"),
-              player(-300.f, 0.f, 100.f, 100.f, 3.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow),
-              inputBox(m_mouse, 0, 0, 1000, 100, sf::Color::Yellow, 100, getSfRenderWindow()) {
+              player(-300.f, 0.f, 100.f, 100.f, 20.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow),
+              inputBox(m_mouse, 0, 0, 1000, 100, sf::Color::Yellow, 100, getSfRenderWindow()),
+              boss(1000, 1000, 100, 100, 10),
+              bossUpdate(boss.update(playerX, playerY)),
+              circle(0, 0, 100, sf::Color::White) {
         }
 
         // 初始化界面元素
@@ -56,6 +61,11 @@ namespace game {
         //sfui::TimeIntervalMs a;
 
         void update() override {
+            playerX = player.getX();
+            playerY = player.getY();
+            bossUpdate.resume();
+            circle.setPosition(boss.getX(), boss.getY());
+
             //std::cout<<a.elapsed()<<std::endl;
 
             //inputbox.updateCursor();
@@ -88,10 +98,10 @@ namespace game {
             const game::Player tempPlayer(m_mouse.getViewPosition().x, m_mouse.getViewPosition().y, 6, 6, 1, 1);
 
 
-            barrage.addBullet(0, 0, 2, static_cast<float>(randomDouble(0, 2 * 3.31415926)), 50, 50, 1);
-            barrage.run();
+            //barrage.addBullet(0, 0, 2, static_cast<float>(randomDouble(0, 2 * 3.31415926)), 50, 50, 1);
+            //barrage.run();
 
-            player.changeHealth(-1 * barrage.dealDamage(player.getHitbox()));
+            //player.changeHealth(-1 * barrage.dealDamage(player.getHitbox()));
             textBox.setTestString(
                 std::string("HP:") + std::to_string(player.getHealth()) + "\ntime:" + std::to_string(
                     timeInterval.elapsed() / 1000) + "s");
@@ -101,17 +111,21 @@ namespace game {
         void render() override {
             drawForWindow(
                 inputBox,
-                textBox
+                textBox,
+                circle,
+                player,
+                player.getHitbox()
             );
 
 
             //particle.drow(mp_window->getSfRenderWindow());
-
-            barrage.setIsDrawHitbox(true);
+            // std::cout<<player.getX()<<" "<<player.getY()<<"\n";
+            //  std::cout<<circle.getX()<<" "<<circle.getY()<<"\n";
+            // std::cout<<boss.getX()<<" "<<boss.getY()<<"\n";
+            //barrage.setIsDrawHitbox(true);
             drawForView(
-                player,
-                player.getHitbox(),
-                barrage
+
+                //barrage
             );
         }
     };

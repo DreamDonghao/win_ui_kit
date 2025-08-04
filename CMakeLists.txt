@@ -1,14 +1,14 @@
 # 指定最低的 CMake 版本要求，这里要求版本 3.8 或更高
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required(VERSION 3.8)
 
 # 如果支持，启用 MSVC 编译器的热重载功能（用于调试时的更高效率）
-if(POLICY CMP0141)
+if (POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
-endif()
+endif ()
 
 set(CMAKE_CXX_STANDARD 23)
 
-project (GAME)
+project(GAME)
 
 # 设置 SFML动态库 路径
 set(SFML_DIR _library/SFML-2.6.1)
@@ -29,6 +29,7 @@ include_directories(
         "game/include/pages"
 
         "include/game"
+        "include/core/tool"
 )
 
 # 添加 SFML 的库文件路径
@@ -58,6 +59,7 @@ add_executable(GAME
         include/game/boss.hpp
         include/game/bullet.hpp
         include/game/playerWithCircle.hpp
+        include/core/tool/co.hpp
 
 )
 
@@ -65,18 +67,14 @@ add_executable(GAME
 # 链接 SFML 的库（自动选择 debug / release）
 set(SFML_LIBS sfml-audio sfml-graphics sfml-network sfml-system sfml-window)
 
-foreach(lib IN LISTS SFML_LIBS)
+foreach (lib IN LISTS SFML_LIBS)
     target_link_libraries(GAME
             debug ${lib}-d
             optimized ${lib}
     )
-endforeach()
-
+endforeach ()
 
 file(COPY ${SFML_DIR}/bin/ DESTINATION ${CMAKE_BINARY_DIR}/)
-
-
-
 
 # 链接 Box2D 静态库
 #target_link_libraries(GAME box2d)
