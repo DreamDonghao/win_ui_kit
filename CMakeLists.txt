@@ -60,6 +60,8 @@ add_executable(GAME
         include/game/bullet.hpp
         include/game/playerWithCircle.hpp
         include/core/tool/co.hpp
+        include/test/tkl.hpp
+        include/customizable/components/Rectangle.hpp
 
 )
 

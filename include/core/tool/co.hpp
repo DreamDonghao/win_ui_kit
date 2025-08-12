@@ -7,130 +7,131 @@
 #include <exception>
 
 namespace sfui {
-template<typename ReturnType>
-struct Task {
-    struct promise_type {
-        Task get_return_object() {
-            return Task(std::coroutine_handle<promise_type>::from_promise(*this));
+    template<typename ReturnType>
+    struct Task {
+        struct promise_type {
+            Task get_return_object() {
+                return Task(std::coroutine_handle<promise_type>::from_promise(*this));
+            }
+
+            [[nodiscard]] std::suspend_never initial_suspend() const { return {}; }
+            [[nodiscard]] std::suspend_always final_suspend() const noexcept { return {}; }
+
+            void return_value(ReturnType val) { m_val = val; }
+
+            auto yield_value(ReturnType val) {
+                m_val = val;
+                return std::suspend_always{};
+            }
+
+            void unhandled_exception() const { std::terminate(); }
+            ReturnType m_val;
+        };
+
+        explicit Task(std::coroutine_handle<promise_type> h)
+            : m_coroutine(h) {
         }
 
-        [[nodiscard]] std::suspend_never initial_suspend() const { return {}; }
-        [[nodiscard]] std::suspend_always final_suspend() const noexcept { return {}; }
+        Task(const Task &) = delete;
 
-        void return_value(ReturnType val) { m_val = val; }
+        Task &operator=(const Task &) = delete;
 
-        auto yield_value(ReturnType val) {
-            m_val = val;
-            return std::suspend_always{};
-        }
-
-        void unhandled_exception() const { std::terminate(); }
-        ReturnType m_val;
-    };
-
-    explicit Task(std::coroutine_handle<promise_type> h)
-        : m_coroutine(h) {
-    }
-
-    Task(const Task &) = delete;
-
-    Task &operator=(const Task &) = delete;
-
-    Task(Task &&other) noexcept
-        : m_coroutine(other.m_coroutine) {
-        other.m_coroutine = nullptr;
-    }
-
-    Task &operator=(Task &&other) noexcept {
-        if (this != &other) {
-            if (m_coroutine) m_coroutine.destroy();
-            m_coroutine = other.m_coroutine;
+        Task(Task &&other) noexcept
+            : m_coroutine(other.m_coroutine) {
             other.m_coroutine = nullptr;
         }
-        return *this;
-    }
 
-    ~Task() {
-        if (m_coroutine) {
-            if (!m_coroutine.done())
+        Task &operator=(Task &&other) noexcept {
+            if (this != &other) {
+                if (m_coroutine) m_coroutine.destroy();
+                m_coroutine = other.m_coroutine;
+                other.m_coroutine = nullptr;
+            }
+            return *this;
+        }
+
+        ~Task() {
+            if (m_coroutine) {
+                if (!m_coroutine.done())
+                    m_coroutine.resume();
+                m_coroutine.destroy();
+            }
+        }
+
+        void resume(){
+            if (!m_coroutine.done()) {
                 m_coroutine.resume();
-            m_coroutine.destroy();
-        }
-    }
-
-    void resume() const {
-        if (!m_coroutine.done()) {
-            m_coroutine.resume();
-        }
-    }
-
-    ReturnType getValue() {
-        return m_coroutine.promise().m_val;
-    }
-
-    [[nodiscard]] bool done() const {
-        return !m_coroutine || m_coroutine.done();
-    }
-
-private:
-    std::coroutine_handle<promise_type> m_coroutine;
-};
-
-
-template<>
-struct Task<void> {
-    struct promise_type {
-        Task get_return_object() {
-            return Task(std::coroutine_handle<promise_type>::from_promise(*this));
+            }
         }
 
-        [[nodiscard]] std::suspend_never initial_suspend() const { return {}; }
-        [[nodiscard]] std::suspend_always final_suspend() const noexcept { return {}; }
-
-        void return_void() const {
+        ReturnType getValue() {
+            return m_coroutine.promise().m_val;
         }
 
-        void unhandled_exception() const { std::terminate(); }
+        [[nodiscard]] bool done() const {
+            return !m_coroutine || m_coroutine.done();
+        }
+
+    private:
+        std::coroutine_handle<promise_type> m_coroutine;
     };
 
-    explicit Task(std::coroutine_handle<promise_type> h)
-        : m_coroutine(h) {
-    }
 
-    Task(const Task &) = delete;
+    template<>
+    struct Task<void> {
+        struct promise_type {
+            Task get_return_object() {
+                return Task(std::coroutine_handle<promise_type>::from_promise(*this));
+            }
 
-    Task &operator=(const Task &) = delete;
+            [[nodiscard]] std::suspend_never initial_suspend() const { return {}; }
+            [[nodiscard]] std::suspend_always final_suspend() const noexcept { return {}; }
 
-    Task(Task &&other) noexcept
-        : m_coroutine(other.m_coroutine) {
-        other.m_coroutine = nullptr;
-    }
+            void return_void() const {
+            }
 
-    Task &operator=(Task &&other) noexcept {
-        if (this != &other) {
-            if (m_coroutine) m_coroutine.destroy();
-            m_coroutine = other.m_coroutine;
+            void unhandled_exception() const { std::terminate(); }
+        };
+
+        explicit Task(std::coroutine_handle<promise_type> h)
+            : m_coroutine(h) {
+        }
+
+        Task(const Task &) = delete;
+
+        Task &operator=(const Task &) = delete;
+
+        Task(Task &&other) noexcept
+            : m_coroutine(other.m_coroutine) {
             other.m_coroutine = nullptr;
         }
-        return *this;
-    }
 
-    ~Task() {
-        if (m_coroutine) m_coroutine.destroy();
-    }
-
-    void resume() const {
-        if (!m_coroutine.done()) {
-            m_coroutine.resume();
+        Task &operator=(Task &&other) noexcept {
+            if (this != &other) {
+                if (m_coroutine) m_coroutine.destroy();
+                m_coroutine = other.m_coroutine;
+                other.m_coroutine = nullptr;
+            }
+            return *this;
         }
-    }
 
-    [[nodiscard]] bool done() const {
-        return !m_coroutine || m_coroutine.done();
-    }
+        ~Task() {
+            if (m_coroutine) m_coroutine.destroy();
+        }
 
-private:
-    std::coroutine_handle<promise_type> m_coroutine;
-};
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        void resume(){
+            if (!m_coroutine.done()) {
+                m_coroutine.resume();
+            }
+        }
+
+        [[nodiscard]] bool done() const {
+            return !m_coroutine || m_coroutine.done();
+        }
+
+    private:
+        std::coroutine_handle<promise_type> m_coroutine;
+    };
 }
 #endif //COROUTINE_HPP

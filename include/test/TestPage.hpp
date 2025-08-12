@@ -35,7 +35,7 @@ namespace game {
               player(-300.f, 0.f, 100.f, 100.f, 20.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow),
               inputBox(m_mouse, 0, 0, 1000, 100, sf::Color::Yellow, 100, getSfRenderWindow()),
               boss(1000, 1000, 100, 100, 10),
-              bossUpdate(boss.update(playerX, playerY)),
+            bossUpdate(boss.update(playerX, playerY)),
               circle(0, 0, 100, sf::Color::White) {
         }
 
@@ -75,7 +75,7 @@ namespace game {
 
             using namespace std::chrono;
 
-            constexpr auto period = 16ms; // 每 16ms 一次 ≈ 60 FPS
+            constexpr auto period = 1ms; // 每 16ms 一次 ≈ 60 FPS
             const auto start = std::chrono::steady_clock::now();
 
             // ... 你的逻辑代码，比如更新粒子、处理输入、渲染等 ...

@@ -18,14 +18,17 @@ namespace game {
             m_x += m_speed * cosf(m_moveAngle);
             m_y += m_speed * sinf(m_moveAngle);
         }
-        float getX()const {
+
+        float getX() const {
             return m_x;
         }
-        float getY()const {
+
+        float getY() const {
             return m_y;
         }
-        sfui::Task<void> update(float &playerX, float &playerY) {
-            while (true) {
+
+         sfui::Task<void> update(const float &playerX, const float &playerY) {
+            while (m_health > 0) {
                 while (distance(m_x, m_y, playerX, playerY) < 1000) {
                     m_x += m_speed * cosf(get_angle_radians(m_x, m_y, playerX, playerY));
                     m_y += m_speed * sinf(get_angle_radians(m_x, m_y, playerX, playerY));
