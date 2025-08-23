@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <Page.hpp>
+#include <thread>
 
 namespace sfui {
     /**
@@ -115,6 +116,7 @@ namespace sfui {
         m_pages[m_nowPageTitle]->updateFrame();
         // 显示当前窗口的画面
         m_sf_renderWindow.display();
+
         m_sf_renderWindow.clear(m_pages[m_nowPageTitle]->getBackgroundColor());
     }
 

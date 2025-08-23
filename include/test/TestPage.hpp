@@ -9,22 +9,30 @@
 #include <bullet.hpp>
 #include <boss.hpp>
 
+#include "test/boss_a.hpp"
+#include <progressBar.hpp>
+
 namespace game {
     class MainMenuPage : public sfui::Page {
     private:
         sfui::TextureItem mainPage;
         sfui::TextBox textBox;
         sf::String str;
-        //sfui::InputBox inputbox;
         float angle = 0;
         game::Player<sfui::Circle> player;
         float playerX{0}, playerY{0};
         //game::Barrage barrage;
         sfui::TimeIntervalMs timeInterval;
-        sfui::InputBox inputBox;
-        game::Boss boss;
+        sfui::TimeIntervalMs abt;
+        game::Boss_a boss;
         sfui::Task<void> bossUpdate;
         sfui::Circle circle;
+        game::Barrage barrage;
+        game::Barrage myBarrage;
+
+        sfui::ProgressBar bossHealthBar;
+        sfui::ProgressBar playerHealthBar;
+        sfui::TimeIntervalMs time;
 
     public:
         explicit MainMenuPage(sfui::Window *p_window)
@@ -32,11 +40,13 @@ namespace game {
               textBox(0, 0, 100, sf::Color::White,
                       R"(zh-cn.ttf)",
                       "hello"),
-              player(-300.f, 0.f, 100.f, 100.f, 20.f, 1.f, 50.f, 1.f, 50, sf::Color::Yellow),
-              inputBox(m_mouse, 0, 0, 1000, 100, sf::Color::Yellow, 100, getSfRenderWindow()),
-              boss(1000, 1000, 100, 100, 10),
-            bossUpdate(boss.update(playerX, playerY)),
-              circle(0, 0, 100, sf::Color::White) {
+              player(-300.f, 0.f, 50.f, 50.f, 5.f, 100, 50.f, 1.f, 25, sf::Color::Yellow),
+
+              boss(1000, 1000, 100, 100, 10000),
+              bossUpdate(boss.update(barrage, myBarrage, playerX, playerY)),
+              circle(0, 0, 100, sf::Color::White),
+              bossHealthBar(800, 50, 800, 30, 10000, 10000),
+              playerHealthBar(200, 30, 100, 20, 100, 100) {
         }
 
         // 初始化界面元素
@@ -44,7 +54,6 @@ namespace game {
             m_ratio = 0.5;
             //std::println("{}", m_ratio);
             //textBox.setTestString(str);
-
             activeMap(sfui::Key::W, [&]() { player.moveUp(); });
             activeMap(sfui::Key::S, [&]() { player.moveDown(); });
             activeMap(sfui::Key::A, [&]() { player.moveLift(); });
@@ -54,28 +63,38 @@ namespace game {
 
         //
         void updateByMessage() override {
-            inputBox.run(mp_window->getEvent());
+            //inputBox.run(mp_window->getEvent());
         }
 
-        // 执行界面逻辑
-        //sfui::TimeIntervalMs a;
 
         void update() override {
+            bossHealthBar.updateCurrentValue(boss.getHealth());
+            playerHealthBar.updateCurrentValue(player.getHealth());
             playerX = player.getX();
             playerY = player.getY();
+            boss.turnTo(player.getX(), player.getY());
             bossUpdate.resume();
             circle.setPosition(boss.getX(), boss.getY());
+            if (abt.elapsed() > 100) {
+                //std::cout<<boss.getHealth()<<std::endl;
+                abt.reset();
+                if (m_mouse.isLeftPressed()) {
+                    myBarrage.addBullet(
+                        player.getX(), player.getY(), 30,
+                        get_angle_radians(player.getX(), player.getY(), m_mouse.getViewPosition().x,
+                                          m_mouse.getViewPosition().y),
+                        3, 3, 15
+                    );
+                }
+            }
+            barrage.run();
+            myBarrage.run();
 
-            //std::cout<<a.elapsed()<<std::endl;
-
-            //inputbox.updateCursor();
-            //particle.run();
-            // particle.setX(m_mouse.getViewPosition().x);
-            // particle.setY(m_mouse.getViewPosition().y);
-
+            //std::cout<<boss.getHitbox().getX()<<" "<<boss.getHitbox().getY()<<std::endl;
+            player.changeHealth(-barrage.dealDamage(player.getHitbox()));
             using namespace std::chrono;
 
-            constexpr auto period = 1ms; // 每 16ms 一次 ≈ 60 FPS
+            constexpr auto period = 8ms; // 每 16ms 一次 ≈ 60 FPS
             const auto start = std::chrono::steady_clock::now();
 
             // ... 你的逻辑代码，比如更新粒子、处理输入、渲染等 ...
@@ -91,41 +110,31 @@ namespace game {
                         << "ms\n";
             }
             setViewCenter(player.getX(), player.getY());
-            // angle+=0.05;
-            //particle.setX(player.getX());
-            //particle.setY(player.getY());
+
+            if (isCollide(player.getHitbox(), boss.getHitbox())) {
+                player.changeHealth(-5);
+            }
 
             const game::Player tempPlayer(m_mouse.getViewPosition().x, m_mouse.getViewPosition().y, 6, 6, 1, 1);
 
-
-            //barrage.addBullet(0, 0, 2, static_cast<float>(randomDouble(0, 2 * 3.31415926)), 50, 50, 1);
-            //barrage.run();
-
-            //player.changeHealth(-1 * barrage.dealDamage(player.getHitbox()));
             textBox.setTestString(
-                std::string("HP:") + std::to_string(player.getHealth()) + "\ntime:" + std::to_string(
-                    timeInterval.elapsed() / 1000) + "s");
+                std::string("HP:") + std::to_string(static_cast<int>(player.getHealth())) + "\ntime:" + std::to_string(
+                    timeInterval.elapsed() / 1000) + "s\n" + std::string("bossHP:") + std::to_string(
+                    static_cast<int>(boss.getHealth())));
         }
 
         // 渲染页面内容到窗口
         void render() override {
             drawForWindow(
-                inputBox,
-                textBox,
-                circle,
-                player,
-                player.getHitbox()
+                bossHealthBar,
+                playerHealthBar
             );
 
-
-            //particle.drow(mp_window->getSfRenderWindow());
-            // std::cout<<player.getX()<<" "<<player.getY()<<"\n";
-            //  std::cout<<circle.getX()<<" "<<circle.getY()<<"\n";
-            // std::cout<<boss.getX()<<" "<<boss.getY()<<"\n";
-            //barrage.setIsDrawHitbox(true);
             drawForView(
-
-                //barrage
+                player,
+                boss,
+                barrage,
+                myBarrage
             );
         }
     };

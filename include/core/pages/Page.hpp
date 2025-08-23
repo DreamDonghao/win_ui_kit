@@ -7,7 +7,6 @@
 #include <inputbox.hpp>
 
 namespace sfui {
-
     template<typename T>
     concept Drawable = requires(T obj, sf::RenderWindow &w)
     {

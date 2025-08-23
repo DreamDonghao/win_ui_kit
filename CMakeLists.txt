@@ -62,6 +62,11 @@ add_executable(GAME
         include/core/tool/co.hpp
         include/test/tkl.hpp
         include/customizable/components/Rectangle.hpp
+        include/core/tool/Angle.hpp
+        src/game/boss.cpp
+        include/game/test/boss_a.hpp
+        src/game/buttle.cpp
+        include/customizable/components/progressBar.hpp
 
 )
 

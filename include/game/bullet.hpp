@@ -6,118 +6,143 @@
 #include <hitbox.hpp>
 
 namespace game {
+    /**
+     * @brief 子弹类，表示游戏中的单个子弹。
+     */
     class Bullet {
     public:
-        Bullet(const float x, const float y, const float speed, const float moveAngle,
-               const float hitboxWidth, const float hitboxHeight, const double attack)
-            : m_x(x), m_y(y), m_speed(speed), m_moveAngle(moveAngle),
-              m_hitbox(x, y, hitboxWidth, hitboxHeight), m_attack(attack) {
-        }
+        /**
+         * @brief 构造一个子弹对象
+         * @param x 子弹初始 X 坐标
+         * @param y 子弹初始 Y 坐标
+         * @param speed 子弹速度
+         * @param moveAngle 移动角度（弧度制）
+         * @param hitboxWidth 碰撞箱宽度
+         * @param hitboxHeight 碰撞箱高度
+         * @param attack 子弹攻击力
+         */
+        Bullet(float x, float y, float speed, float moveAngle,
+               float hitboxWidth, float hitboxHeight, double attack);
+        virtual ~Bullet() = default;
+        /**
+         * @brief 更新子弹位置并处理生命周期。
+         */
+        void move();
 
-        void move() {
-            --m_existFrame;
-            if (m_existFrame == 0) {
-                m_isAlive = false;
-            }
-            m_x += m_speed * cosf(m_moveAngle);
-            m_y += m_speed * sinf(m_moveAngle);
-            m_hitbox.setPosition(m_x, m_y);
-        }
+        /**
+         * @brief 获取子弹 X 坐标
+         * @return X 坐标
+         */
+        [[nodiscard]] float getX() const;
 
-        [[nodiscard]] float getX() const {
-            return m_x;
-        }
+        /**
+         * @brief 获取子弹 Y 坐标
+         * @return Y 坐标
+         */
+        [[nodiscard]] float getY() const;
 
-        [[nodiscard]] float getY() const {
-            return m_y;
-        }
+        /**
+         * @brief 获取子弹的碰撞箱
+         * @return 碰撞箱对象
+         */
+        [[nodiscard]] Hitbox getHitbox() const;
 
-        [[nodiscard]] Hitbox getHitbox() const {
-            return m_hitbox;
-        }
+        /**
+         * @brief 获取子弹的攻击力
+         * @return 攻击力数值
+         */
+        [[nodiscard]] double getAttack() const;
 
-        [[nodiscard]] double getAttack()const{
-            return m_attack;
-        }
+        /**
+         * @brief 设置子弹是否存活
+         * @param alive 是否存活
+         */
+        void setAlive(bool alive);
 
-        void setAlive(const bool alive) {
-            m_isAlive = alive;
-        }
+        /**
+         * @brief 判断子弹是否仍存活
+         * @return true 表示存活，false 表示消失
+         */
+        [[nodiscard]] bool isAlive() const;
 
-        [[nodiscard]] bool isAlive()const {
-            return m_isAlive;
-        }
+        /**
+         * @brief 绘制子弹
+         * @param window 渲染窗口
+         */
+        virtual void draw(sf::RenderWindow &window) const;
 
-        void draw(sf::RenderWindow &window)const {
-            const sfui::Circle circle(m_x,m_y,25,sf::Color::Red);
-            circle.draw(window);
-        }
-
-        void drawHitbox(sf::RenderWindow &window)const{
-            m_hitbox.draw(window);
-        }
+        /**
+         * @brief 绘制子弹的碰撞箱
+         * @param window 渲染窗口
+         */
+        void drawHitbox(sf::RenderWindow &window) const;
 
     private:
-        float m_x;
-        float m_y;
-        float m_speed;
-        float m_moveAngle;
-        Hitbox m_hitbox;
-        double m_attack;
-        bool m_isAlive{true};
-        int m_existFrame{1000};
+        float m_x;              ///< 子弹 X 坐标
+        float m_y;              ///< 子弹 Y 坐标
+        float m_speed;          ///< 子弹速度
+        float m_moveAngle;      ///< 移动角度（弧度）
+        Hitbox m_hitbox;        ///< 碰撞箱
+        double m_attack;        ///< 攻击力
+        bool m_isAlive{true};   ///< 是否存活
+        int m_existFrame{100}; ///< 存活帧数
     };
 
+    /**
+     * @brief 弹幕类，管理多个子弹对象。
+     */
     class Barrage {
     public:
+        /**
+         * @brief 默认构造函数
+         */
         Barrage() = default;
+        Barrage& operator=(Barrage&&) = default;
 
-        void addBullet(const float x, const float y, const float speed, const float moveAngle,
-               const float hitboxWidth, const float hitboxHeight, const double attack) {
-            m_bullets.emplace_back(x,y,speed,moveAngle,hitboxHeight,hitboxWidth,attack);
-        }
+        Barrage(const Barrage&) = delete;
+        Barrage& operator=(const Barrage&) = delete;
+        /**
+         * @brief 添加一颗子弹
+         * @param x 初始 X 坐标
+         * @param y 初始 Y 坐标
+         * @param speed 子弹速度
+         * @param moveAngle 移动角度（弧度）
+         * @param hitboxWidth 碰撞箱宽度
+         * @param hitboxHeight 碰撞箱高度
+         * @param attack 子弹攻击力
+         */
+        void addBullet(float x, float y, float speed, float moveAngle,
+                       float hitboxWidth, float hitboxHeight, double attack);
 
-        [[nodiscard]] double dealDamage(const Hitbox& hitbox){
-            double damage = 0;
-            for (auto &bullet: m_bullets) {
-                if (isCollide(hitbox,bullet.getHitbox())) {
-                    damage+=bullet.getAttack();
-                    bullet.setAlive(false);
-                }
-            }
-            return damage;
-        }
+        /**
+         * @brief 检测与指定碰撞箱的碰撞，并结算伤害。
+         * @param hitbox 目标碰撞箱
+         * @return 本次造成的总伤害值
+         */
+        [[nodiscard]] double dealDamage(const Hitbox &hitbox);
 
-        void run() {
-            for (size_t i = 0;i <m_bullets.size();) {
-                m_bullets[i].move();
-                if (!m_bullets[i].isAlive()) {
-                    m_bullets[i] = m_bullets.back();
-                    m_bullets.pop_back();
+        /**
+         * @brief 更新所有子弹的状态与位置。
+         */
+        void run();
 
-                }else {
-                    ++i;
-                }
-            }
-        }
+        /**
+         * @brief 设置是否绘制子弹的碰撞箱
+         * @param drawHitbox true 绘制，false 不绘制
+         */
+        void setIsDrawHitbox( bool drawHitbox);
 
-        void setIsDrawHitbox(const bool drawHitbox) {
-            m_isDrawHitbox = drawHitbox;
-        }
-
-        void draw(sf::RenderWindow& window) const{
-            for (auto &bullet: m_bullets) {
-               bullet.draw(window);
-                if (m_isDrawHitbox) {
-                    bullet.drawHitbox(window);
-                }
-            }
-        }
+        /**
+         * @brief 绘制所有子弹
+         * @param window 渲染窗口
+         */
+        void draw(sf::RenderWindow &window) const;
 
     private:
-        std::vector<Bullet> m_bullets;
-        bool m_isDrawHitbox{false};
-    };
-} // game
+        std::vector<std::unique_ptr<Bullet>> m_bullets; ///< 子弹容器
+        bool m_isDrawHitbox{false};    ///< 是否绘制碰撞箱
 
-#endif //BULLET_HPP
+    };
+} // namespace game
+
+#endif // BULLET_HPP

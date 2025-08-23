@@ -48,6 +48,16 @@ inline double randomDouble(const double a, const double b) {
     return dist(gen);
 }
 
+inline int randomInt(const int min, const int max) {
+    // 静态局部变量，只初始化一次
+    static std::random_device rd;
+    static std::mt19937 gen(rd()); // Mersenne Twister 引擎
+
+    std::uniform_int_distribution<int> dist(min, max);
+    return dist(gen);
+}
+
+
 inline float distance(const float x1, const float y1, const float x2, const float y2) {
     return sqrt( (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
 }

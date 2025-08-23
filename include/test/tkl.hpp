@@ -16,7 +16,7 @@ namespace game {
     private:
         std::vector<sfui::Rectangle> tkl;
         std::function<sfui::Task<void>()> updateTkl;
-        sfui::Task<void> tklUpdate;
+        std::vector<sfui::Task<void>> cos;
         sfui::TimeIntervalMs tklUpdateTime;
 
     public:
@@ -30,6 +30,7 @@ namespace game {
                   {800, 700, 185, 185, sf::Color::White, sf::Color::Black},
               }),
               updateTkl([&]()-> sfui::Task<void> {
+                  co_await std::suspend_always{};
                   bool flag = true;
                   // ReSharper disable once CppDFAEndlessLoop
                   while (true) {
@@ -51,12 +52,12 @@ namespace game {
                       }
                       co_await std::suspend_always{};
                   }
-              }), tklUpdate(updateTkl()) {
+              }){
         }
 
         // 初始化界面元素
         void init() override {
-            auto tklUpdate = updateTkl();
+            cos.emplace_back(updateTkl());
         }
 
         void updateByMessage() override {
@@ -64,7 +65,7 @@ namespace game {
 
         // 执行逻辑
         void update() override {
-            tklUpdate.resume();
+            cos[0].resume();
         }
 
         // 渲染页面内容到窗口

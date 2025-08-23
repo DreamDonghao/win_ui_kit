@@ -6,32 +6,61 @@
 #include "hitbox.hpp"
 #include <co.hpp>
 #include <tool.hpp>
+#include <angle.hpp>
+#include <SFML/Window.hpp>
+
+#include "bullet.hpp"
+#include "timepiece.hpp"
 
 namespace game {
     class Boss {
     public:
+        virtual ~Boss() = default;
+
         Boss(const float x, const float y, const float hitboxWidth, const float hitboxHeight, const double health)
             : m_x(x), m_y(y), m_hitbox(x, y, hitboxWidth, hitboxHeight), m_health(health) {
         }
 
-        void move() {
-            m_x += m_speed * cosf(m_moveAngle);
-            m_y += m_speed * sinf(m_moveAngle);
+        void move();
+
+        const Hitbox &getHitbox() const {
+            return m_hitbox;
         }
 
-        float getX() const {
-            return m_x;
+        float getX() const;
+
+        float getY() const;
+
+        void setX(float x);
+
+        void setY(float y);
+
+        float getSpeed() const {
+            return m_speed;
         }
 
-        float getY() const {
-            return m_y;
+        void setSpeed(const float speed) {
+            m_speed = speed;
         }
 
-         sfui::Task<void> update(const float &playerX, const float &playerY) {
+        void turnTo(float x, float y);
+
+        double getHealth() const {
+            return m_health;
+        }
+
+        void setHealth(const double health) {
+            m_health = health;
+        }
+
+        void changeHealth(const double health) {
+            m_health += health;
+        }
+
+        virtual sfui::Task<void> update(Barrage &barrage,float &playerX, float &playerY) {
             while (m_health > 0) {
                 while (distance(m_x, m_y, playerX, playerY) < 1000) {
-                    m_x += m_speed * cosf(get_angle_radians(m_x, m_y, playerX, playerY));
-                    m_y += m_speed * sinf(get_angle_radians(m_x, m_y, playerX, playerY));
+                    move();
                     co_await std::suspend_always{};
                 }
                 while (distance(m_x, m_y, playerX, playerY) >= 1000) {
@@ -41,14 +70,18 @@ namespace game {
             co_return;
         }
 
+        virtual void draw(sf::RenderWindow &window) {
+
+        }
     private:
         float m_x;
         float m_y;
-        float m_speed{21};
-        float m_moveAngle;
+        float m_speed{10};
+        sfui::Angle m_moveAngle{0};
         Hitbox m_hitbox;
         double m_health;
         int state{0};
+
     };
 } // game
 

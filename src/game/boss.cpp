@@ -1,0 +1,35 @@
+//
+// Created by donghao on 25-8-19.
+//
+#include <boss.hpp>
+
+namespace game {
+    void Boss::move() {
+        m_x += m_speed * static_cast<float>(m_moveAngle.getCos());
+        m_y += m_speed * static_cast<float>(m_moveAngle.getSin());
+        m_hitbox.setPosition(m_x, m_y);
+
+    }
+
+    float Boss::getX() const {
+        return m_x;
+    }
+
+    float Boss::getY() const {
+        return m_y;
+    }
+
+    void Boss::setX(const float x) {
+        m_x = x;
+        m_hitbox.setX(m_x);
+    }
+
+    void Boss::setY(const float y) {
+        m_y = y;
+        m_hitbox.setY(m_y);
+    }
+
+    void Boss::turnTo(const float x, const float y) {
+        m_moveAngle.setAngle(get_angle_radians(m_x, m_y, x, y));
+    }
+}
