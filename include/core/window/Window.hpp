@@ -12,18 +12,18 @@ namespace sfui {
     using PagePtr = std::unique_ptr<PageType>;
 
 
-
     template<typename PageType>
-    inline PagePtr<PageType>makePage() {
+    inline PagePtr<PageType> makePage() {
         return std::make_unique<PageType>();
     }
-/**
-     * @brief 创建一个新的页面实例。
-     * @tparam PageType 页面类型。
-     * @tparam Args 构造参数类型。
-     * @param args 转发给页面构造函数的参数。
-     * @return 创建的页面智能指针。
-     */
+
+    /**
+         * @brief 创建一个新的页面实例。
+         * @tparam PageType 页面类型。
+         * @tparam Args 构造参数类型。
+         * @param args 转发给页面构造函数的参数。
+         * @return 创建的页面智能指针。
+         */
     template<typename PageType, typename... Args>
     inline PagePtr<PageType> makePage(Args &&... args) {
         return std::make_unique<PageType>(std::forward<Args>(args)...);
@@ -54,12 +54,15 @@ namespace sfui {
     class Window {
     public:
         /**
-         * @brief 构造窗口对象。
-         * @param width 窗口宽度（像素）。
-         * @param height 窗口高度（像素）。
-         * @param windowState 初始窗口状态（窗口/全屏）。
-         */
-        Window(const int &width, const int &height, const WindowState &windowState);
+        * @brief 构造窗口对象，初始化窗口和屏幕参数。
+        * @param width 窗口宽度。
+        * @param height 窗口高度。
+        * @param windowState 初始窗口状态。
+        * @param framerateLimit 帧率上限。
+        * @param verticalSyncEnabled 是否启用垂直同步。
+        */
+        Window(const int &width, const int &height, const WindowState &windowState,
+               const int &framerateLimit, const bool &verticalSyncEnabled);
 
         /**
          * @brief 析构函数。
@@ -72,7 +75,7 @@ namespace sfui {
          * @param verticalSyncEnabled 是否启用垂直同步。
          * @return 初始化是否成功。
          */
-        bool init(const int &framerateLimit, const bool &verticalSyncEnabled);
+        bool setFramerate(const int &framerateLimit, const bool &verticalSyncEnabled);
 
         /**
          * @brief 向窗口添加页面。
@@ -137,7 +140,7 @@ namespace sfui {
         /**
          * @brief 处理实时输入。
          */
-        void handleRealTimeInput();
+        void handleRealTimeInput() const;
 
         /**
          * @brief 处理SFML事件输入。

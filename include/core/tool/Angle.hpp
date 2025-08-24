@@ -29,10 +29,14 @@ namespace sfui {
             m_angle = angle;
         }
 
+        [[nodiscard]] double getAngleValue() const {
+            return m_angle;
+        }
+
         void revolve(const double angle) {
-            m_angle += angle;
-            if (m_angle > 2 * PI) {
-                m_angle -= static_cast<int>(m_angle / (2 * PI)) * 2 * PI;
+            m_angle = std::fmod(m_angle + angle, 2 * PI);
+            if (m_angle < 0) {
+                m_angle += 2 * PI;
             }
         }
 

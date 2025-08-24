@@ -17,8 +17,8 @@ namespace game {
         if (m_existFrame == 0) {
             m_isAlive = false;
         }
-        m_x += m_speed * cosf(m_moveAngle);
-        m_y += m_speed * sinf(m_moveAngle);
+        m_x += m_speed * m_moveAngle.getCos();
+        m_y += m_speed * m_moveAngle.getSin();
         m_hitbox.setPosition(m_x, m_y);
     }
 
@@ -55,22 +55,20 @@ namespace game {
         m_hitbox.draw(window);
     }
 
-    void Barrage::addBullet(const float x, const float y, const float speed, const float moveAngle,
-                            const float hitboxWidth, const float hitboxHeight, const double attack) {
-        m_bullets.emplace_back(std::make_unique<Bullet>(
-            x, y, speed, moveAngle, hitboxHeight, hitboxWidth, attack
-        ));
+    void Barrage::addBullet(std::unique_ptr<Bullet> &&bullet) {
+        m_bullets.push_back(std::move(bullet));
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst
     double Barrage::dealDamage(const Hitbox &hitbox) {
         double damage = 0;
-        for (const auto &bullet: m_bullets) {
-            if (isCollide(hitbox, bullet->getHitbox())) {
-                damage += bullet->getAttack();
-                bullet->setAlive(false);
-            }
-        }
+        std::for_each(std::execution::par_unseq, m_bullets.begin(), m_bullets.end(),
+                      [& hitbox,&damage](auto &bullet) {
+                          if (isCollide(hitbox, bullet->getHitbox())) {
+                              damage += bullet->getAttack();
+                              bullet->setAlive(false);
+                          }
+                      });
         return damage;
     }
 
@@ -91,11 +89,12 @@ namespace game {
     }
 
     void Barrage::draw(sf::RenderWindow &window) const {
-        for (auto &bullet: m_bullets) {
-            bullet->draw(window);
-            if (m_isDrawHitbox) {
-                bullet->drawHitbox(window);
-            }
-        }
+        std::for_each(std::execution::seq, m_bullets.begin(), m_bullets.end(),
+                      [&](auto &bullet) {
+                          bullet->draw(window);
+                          if (m_isDrawHitbox) {
+                              bullet->drawHitbox(window);
+                          }
+                      });
     }
 }

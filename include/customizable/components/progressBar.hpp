@@ -12,19 +12,33 @@ namespace sfui {
     class ProgressBar {
     public:
         ProgressBar(const float x, const float y, const float width, const float height,
-                    const double maxValue, const double currentValue)
+                    const double maxValue, const double currentValue,
+                  const sf::Color backgroundColor  ,const sf::Color barColor)
             : m_x(x), m_y(y), m_width(width), m_height(height),
-              m_maxValue(maxValue), m_currentValue(currentValue) {
+              m_maxValue(maxValue), m_currentValue(currentValue),
+           m_backgroundColor(backgroundColor) ,  m_barColor(barColor)  {
         }
 
         virtual ~ProgressBar() = default;
 
+        void setX(const float x) {
+            m_x = x;
+        }
+
+        void setY(const float y) {
+            m_y = y;
+        }
+
         void updateCurrentValue(const double currentValue) {
-            m_currentValue = currentValue;
+            if (currentValue < m_maxValue) {
+                m_currentValue = currentValue;
+            } else {
+                m_currentValue = m_maxValue;
+            }
         }
 
         [[nodiscard]] double getProgress() const {
-              return m_currentValue / m_maxValue;
+            return m_currentValue / m_maxValue;
         }
 
         [[nodiscard]] double getCurrentValue() const {
@@ -40,12 +54,12 @@ namespace sfui {
         }
 
         virtual void draw(sf::RenderWindow &window) {
-            const Rectangle back(m_x, m_y, m_width, m_height, sf::Color::White, sf::Color::White);
+            const Rectangle back(m_x, m_y, m_width, m_height, m_backgroundColor, m_backgroundColor);
             const double progress = getProgress();
             const Rectangle bar(
                 m_x - m_width * (1 - progress) / 2, m_y,
                 m_width * progress, m_height,
-                sf::Color::Red, sf::Color::Red
+                m_barColor,m_barColor
             );
             back.draw(window);
             bar.draw(window);
@@ -58,6 +72,8 @@ namespace sfui {
         float m_height;
         double m_maxValue;
         double m_currentValue;
+        sf::Color m_backgroundColor;
+        sf::Color m_barColor;
     };
 } // sfui
 

@@ -14,24 +14,18 @@ constexpr int heigth = 10;
 constexpr int ratio = 100;
 
 
-
-
 #define TEST
 
 
-
-
-
-
-
-
 int main() {
-//#define TEST
+    //#define TEST
 
 #ifdef TEST
-    sfui::Window window(width * ratio, heigth * ratio, sfui::WindowState::Windowed);
-    window.init(165, false);
-    window.addPage(sfui::strToWstr("铁傀儡机"),sfui::makePage<game::TklPage>(&window));
+    sfui::Window window(
+        width * ratio, heigth * ratio, sfui::WindowState::Windowed,
+        120, false
+    );
+    window.addPage(sfui::strToWstr("铁傀儡机"), sfui::makePage<game::TklPage>(&window));
     window.addPage(sfui::strToWstr("主界面"), sfui::makePage<game::MainMenuPage>(&window));
     window.startShow(sfui::strToWstr("主界面"));
 #endif

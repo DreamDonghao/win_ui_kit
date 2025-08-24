@@ -2,13 +2,13 @@
 // Created by donghao on 25-8-19.
 //
 #include <boss.hpp>
+#include <iostream>
 
 namespace game {
     void Boss::move() {
         m_x += m_speed * static_cast<float>(m_moveAngle.getCos());
         m_y += m_speed * static_cast<float>(m_moveAngle.getSin());
         m_hitbox.setPosition(m_x, m_y);
-
     }
 
     float Boss::getX() const {
@@ -31,5 +31,9 @@ namespace game {
 
     void Boss::turnTo(const float x, const float y) {
         m_moveAngle.setAngle(get_angle_radians(m_x, m_y, x, y));
+    }
+
+    void Boss::setMoveAngle(const double angle) {
+        m_moveAngle.setAngle(angle);
     }
 }

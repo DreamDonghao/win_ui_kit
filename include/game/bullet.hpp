@@ -4,6 +4,10 @@
 #ifndef BULLET_HPP
 #define BULLET_HPP
 #include <hitbox.hpp>
+#include <algorithm>
+#include <execution>
+#include <tool.hpp>
+#include "angle.hpp"
 
 namespace game {
     /**
@@ -23,11 +27,21 @@ namespace game {
          */
         Bullet(float x, float y, float speed, float moveAngle,
                float hitboxWidth, float hitboxHeight, double attack);
+
         virtual ~Bullet() = default;
+
+        void turnAngle(const float angle) {
+            m_moveAngle.revolve(angle);
+        }
+
+        sfui::Angle getMoveAngle() const {
+            return m_moveAngle;
+        }
+
         /**
          * @brief 更新子弹位置并处理生命周期。
          */
-        void move();
+        virtual void move();
 
         /**
          * @brief 获取子弹 X 坐标
@@ -78,14 +92,14 @@ namespace game {
         void drawHitbox(sf::RenderWindow &window) const;
 
     private:
-        float m_x;              ///< 子弹 X 坐标
-        float m_y;              ///< 子弹 Y 坐标
-        float m_speed;          ///< 子弹速度
-        float m_moveAngle;      ///< 移动角度（弧度）
-        Hitbox m_hitbox;        ///< 碰撞箱
-        double m_attack;        ///< 攻击力
-        bool m_isAlive{true};   ///< 是否存活
-        int m_existFrame{100}; ///< 存活帧数
+        float m_x;               ///< 子弹 X 坐标
+        float m_y;               ///< 子弹 Y 坐标
+        float m_speed;           ///< 子弹速度
+        sfui::Angle m_moveAngle; ///< 移动角度（弧度）
+        Hitbox m_hitbox;         ///< 碰撞箱
+        double m_attack;         ///< 攻击力
+        bool m_isAlive{true};    ///< 是否存活
+        int m_existFrame{1000};  ///< 存活帧数
     };
 
     /**
@@ -97,22 +111,18 @@ namespace game {
          * @brief 默认构造函数
          */
         Barrage() = default;
-        Barrage& operator=(Barrage&&) = default;
 
-        Barrage(const Barrage&) = delete;
-        Barrage& operator=(const Barrage&) = delete;
+        Barrage &operator=(Barrage &&) = default;
+
+        Barrage(const Barrage &) = delete;
+
+        Barrage &operator=(const Barrage &) = delete;
+
         /**
          * @brief 添加一颗子弹
-         * @param x 初始 X 坐标
-         * @param y 初始 Y 坐标
-         * @param speed 子弹速度
-         * @param moveAngle 移动角度（弧度）
-         * @param hitboxWidth 碰撞箱宽度
-         * @param hitboxHeight 碰撞箱高度
-         * @param attack 子弹攻击力
+         * @param bullet
          */
-        void addBullet(float x, float y, float speed, float moveAngle,
-                       float hitboxWidth, float hitboxHeight, double attack);
+        void addBullet(std::unique_ptr<Bullet> &&bullet);
 
         /**
          * @brief 检测与指定碰撞箱的碰撞，并结算伤害。
@@ -130,7 +140,7 @@ namespace game {
          * @brief 设置是否绘制子弹的碰撞箱
          * @param drawHitbox true 绘制，false 不绘制
          */
-        void setIsDrawHitbox( bool drawHitbox);
+        void setIsDrawHitbox(bool drawHitbox);
 
         /**
          * @brief 绘制所有子弹
@@ -139,9 +149,8 @@ namespace game {
         void draw(sf::RenderWindow &window) const;
 
     private:
-        std::vector<std::unique_ptr<Bullet>> m_bullets; ///< 子弹容器
-        bool m_isDrawHitbox{false};    ///< 是否绘制碰撞箱
-
+        std::vector<std::unique_ptr<Bullet> > m_bullets; ///< 子弹容器
+        bool m_isDrawHitbox{false};                      ///< 是否绘制碰撞箱
     };
 } // namespace game
 

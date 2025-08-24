@@ -67,6 +67,7 @@ add_executable(GAME
         include/game/test/boss_a.hpp
         src/game/buttle.cpp
         include/customizable/components/progressBar.hpp
+        include/game/test/player_a.hpp
 
 )
 
@@ -89,4 +90,5 @@ file(COPY ${SFML_DIR}/bin/ DESTINATION ${CMAKE_BINARY_DIR}/)
 set(ASSETS_DIR assets)
 
 # 将资源文件复制到构建目录中
-file(COPY ${ASSETS_DIR}/images DESTINATION ${CMAKE_BINARY_DIR}/)
+#file(COPY ${ASSETS_DIR}/images DESTINATION ${CMAKE_BINARY_DIR}/)
+file(COPY ${ASSETS_DIR} DESTINATION ${CMAKE_BINARY_DIR}/)

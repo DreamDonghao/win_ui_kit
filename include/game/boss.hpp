@@ -45,6 +45,12 @@ namespace game {
 
         void turnTo(float x, float y);
 
+        void setMoveAngle(double angle);
+
+        sfui::Angle getMoveAngle() const {
+            return m_moveAngle;
+        }
+
         double getHealth() const {
             return m_health;
         }

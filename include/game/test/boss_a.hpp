@@ -7,6 +7,7 @@
 #include <Circle.hpp>
 #include <bullet.hpp>
 
+
 namespace game {
     class Boss_a : public Boss {
     public:
@@ -14,32 +15,120 @@ namespace game {
             : Boss(x, y, hitboxWidth, hitboxHeight, health) {
         }
 
-        sfui::Task<void> update(Barrage &barrage, Barrage &enemyBarrage, float &playerX, float &playerY) {
+        sfui::Task<void> update(Barrage &barrage, Barrage &enemyBarrage, const Player &player) {
             co_await std::suspend_always{};
             double oldHealth = getHealth();
-            sfui::TimeIntervalMs t1;
-            sfui::TimeIntervalMs t2;
-            sfui::TimeIntervalMs t3;
+            sfui::TimeIntervalMs t1, t2, t3;
             while (getHealth() > 0) {
-                alwaysActive(barrage, enemyBarrage, playerX, playerY, oldHealth);
+                alwaysActive(barrage, enemyBarrage, player, oldHealth);
 
 
-                t1.reset();
-                while (t1.elapsed() < 5000) {
-                    alwaysActive(barrage, enemyBarrage, playerX, playerY, oldHealth);
-                    co_await std::suspend_always{};
+                switch (randomInt(0, 5)) {
+                    case 1:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            alwaysActive(barrage, enemyBarrage, player, oldHealth);
+                            if (t3.elapsed() > 100) {
+                                t3.reset();
+                                addBullet(barrage);
+                            }
+                            co_await std::suspend_always{};
+                        }
+                        break;
+                    case 2:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            setSpeed(30);
+                            setMoveAngle(
+                                get_angle_radians(getX(), getY(), player.getX(), player.getY()) - sfui::PI / 2);
+
+                            move();
+                            angle.revolve(0.05);
+                            std::for_each(
+                                std::execution::par_unseq,
+                                abc.begin(), abc.end(),
+                                [this](auto &a) {
+                                    a.setPosition(getX() + 60 * angle.getCos(), getY() + 60 * angle.getSin());
+                                    angle.revolve(2 * sfui::PI / static_cast<float>(abc.size()));
+                                });
+                            if (t3.elapsed() > 100) {
+                                t3.reset();
+                                addBullet(barrage);
+                            }
+                            changeHealth(-enemyBarrage.dealDamage(getHitbox()));
+                            co_await std::suspend_always{};
+                        }
+                        setSpeed(2.5);
+                        break;
+                    case 3:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            setSpeed(30);
+                            setMoveAngle(
+                                get_angle_radians(getX(), getY(), player.getX(), player.getY()) - sfui::PI / 2);
+
+                            move();
+                            angle.revolve(0.05);
+                            std::for_each(
+                                std::execution::par_unseq,
+                                abc.begin(), abc.end(),
+                                [this](auto &a) {
+                                    a.setPosition(getX() + 60 * angle.getCos(), getY() + 60 * angle.getSin());
+                                    angle.revolve(2 * sfui::PI / static_cast<float>(abc.size()));
+                                });
+                            if (t3.elapsed() > 100) {
+                                t3.reset();
+                                for (auto &a: abc) {
+                                    barrage.addBullet(std::make_unique<Bullet>(
+                                            a.getX(), a.getY(), 10,
+                                            get_angle_radians(a.getX(), a.getY(), player.getX(), player.getY()),
+                                            2, 2, 1)
+                                    );
+                                }
+                            }
+                            changeHealth(-enemyBarrage.dealDamage(getHitbox()));
+                            co_await std::suspend_always{};
+                        }
+                        setSpeed(2.5);
+
+                        break;
+                    case 4:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            if (t3.elapsed() > 200) {
+                                t3.reset();
+                                for (int i = player.getY() - 1500; i < player.getY() + 1500; i += 250) {
+                                    barrage.addBullet(
+                                        std::make_unique<Bullet>(player.getX() - 1500, i, 10, 0, 2, 2, 1));
+                                }
+                            }
+                            alwaysActive(barrage, enemyBarrage, player, oldHealth);
+                            co_await std::suspend_always{};
+                        }
+                        break;
+                    case 5:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            if (t3.elapsed() > 200) {
+                                t3.reset();
+                                for (int i = player.getX() - 1500; i <= player.getX() + 1500; i += 250) {
+                                    barrage.addBullet(
+                                        std::make_unique<Bullet>(i, player.getY() - 1500, 10, sfui::PI / 2, 2, 2, 1));
+                                }
+                            }
+                            alwaysActive(barrage, enemyBarrage, player, oldHealth);
+                            co_await std::suspend_always{};
+                        }
+                        break;
+                    default:
+                        t2.reset();
+                        while (t3.elapsed() < 5000) {
+                            alwaysActive(barrage, enemyBarrage, player, oldHealth);
+                            co_await std::suspend_always{};
+                        }
+                        break;
                 }
 
-
-                t2.reset();
-                while (t2.elapsed() < 7000) {
-                    alwaysActive(barrage, enemyBarrage, playerX, playerY, oldHealth);
-                    if (t3.elapsed() > 100) {
-                        t3.reset();
-                        addBullet(barrage);
-                    }
-                    co_await std::suspend_always{};
-                }
 
                 co_await std::suspend_always{};
             }
@@ -49,45 +138,47 @@ namespace game {
 
         void addBullet(Barrage &barrage) const {
             for (auto &a: abc) {
-                barrage.addBullet(a.getX(), a.getY(), 15, get_angle_radians(getX(), getY(), a.getX(), a.getY()),
-                                  2, 2, 1);
+                barrage.addBullet(std::make_unique<Bullet>(
+                        a.getX(), a.getY(), 10, get_angle_radians(getX(), getY(), a.getX(), a.getY()),
+                        2, 2, 1)
+                );
             }
         }
 
         void draw(sf::RenderWindow &window) override {
+            //printf("1");
             for (const auto &a: abc) {
                 a.draw(window);
             }
         }
 
-    private
-    :
+    private:
         std::vector<sfui::Circle> abc{
-            {getX(), getY(), 3, sf::Color::White},
+            {getX(), getY(),3, sf::Color::White},
             {getX(), getY(), 3, sf::Color::White}
         };
 
         sfui::Angle angle{0};
 
-        void alwaysActive(Barrage &barrage, Barrage &enemyBarrage, float &playerX, float &playerY,
+        void alwaysActive(Barrage &barrage, Barrage &enemyBarrage, const Player &player,
                           double &oldHealth) {
             if (oldHealth - getHealth() > 1000) {
                 abc.emplace_back(getX(), getY(), 3, sf::Color::White);
                 oldHealth = getHealth();
             }
             angle.revolve(0.05);
-            for (auto &a: abc) {
-                a.setPosition(getX() + 60 * angle.getCos(), getY() + 60 * angle.getSin());
-                angle.revolve(2 * sfui::PI / static_cast<float>(abc.size()));
-            }
 
-            if (distance(playerX,playerY,getX(),getY())>1000) {
+            std::for_each(
+                std::execution::par_unseq, abc.begin(), abc.end(),
+                [this](auto &a) {
+                    a.setPosition(getX() + 60 * angle.getCos(), getY() + 60 * angle.getSin());
+                    angle.revolve(2 * sfui::PI / static_cast<float>(abc.size()));
+                });
+
+            if (distance(player.getX(), player.getY(), getX(), getY()) > 1000) {
                 setSpeed(12.5);
-
-            }else {
-
+            } else {
                 setSpeed(2.5);
-
             }
             changeHealth(-enemyBarrage.dealDamage(getHitbox()));
             move();

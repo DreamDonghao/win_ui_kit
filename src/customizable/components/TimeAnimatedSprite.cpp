@@ -1,4 +1,5 @@
 #include <TimeAnimatedSprite.hpp>
+#include <execution>
 
 namespace sfui {
 
@@ -23,10 +24,11 @@ namespace sfui {
         m_height = height;
         m_x = x;
         m_y = y;;
-        for (auto &textureItem : m_textureItems) {
+        std::for_each(std::execution::par_unseq, std::begin(m_textureItems), std::end(m_textureItems),
+            [&](auto &textureItem) {
             textureItem.setPosition(m_x, m_y);
             textureItem.setShowSize(m_width, m_height);
-        }
+        });
     }
     const sf::Sprite &TimeAnimatedSprite::getSprite() {
         if (m_clock.getElapsedTime() >= m_continuationTime) {
@@ -42,8 +44,9 @@ namespace sfui {
     void TimeAnimatedSprite::setXY(const float &x, const float &y) {
         m_x = x;
         m_y = y;
-        for (auto &textureItem : m_textureItems) {
+        std::for_each(std::execution::par_unseq, std::begin(m_textureItems), std::end(m_textureItems),
+            [&](auto &textureItem) {
             textureItem.setPosition(m_x, m_y);
-        }
+        });
     }
 }
