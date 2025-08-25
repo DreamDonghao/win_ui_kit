@@ -24,12 +24,12 @@ namespace sfui {
          */
         TextBox(const float x, const float y, const unsigned int textSize,
                 const sf::Color testColor, const std::filesystem::path &fontPath,
-                std::string textString)
+                sf::String textString)
             : m_x(x), m_y(y), m_textString(std::move(textString)),
               m_textColor(testColor), m_textSize(textSize) {
             m_font.loadFromFile(fontPath.string());
             m_text.setFont(m_font);
-            m_text.setString(m_textString);
+            m_text.setString(textString);
             m_text.setCharacterSize(m_textSize);
             m_text.setFillColor(m_textColor);
             m_text.setPosition(m_x, m_y);

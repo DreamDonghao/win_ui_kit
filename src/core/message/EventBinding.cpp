@@ -4,7 +4,7 @@
  */
 #include <EventBinding.hpp>
 #include <utility>
-#include <print>
+
 namespace sfui {
     EvectBingding::EvectBingding() = default;
 
@@ -12,11 +12,11 @@ namespace sfui {
         m_keyBindings[key] = std::move(action);
     }
 
-    void EvectBingding::bindEvent(MouseButton mouseButton, const Area *const area, const Action& action) {
+    void EvectBingding::bindEvent(MouseButton mouseButton, const Area *const area, const Action &action) {
         m_mouseButtonBindings[mouseButton].emplace_back(area, action);
     }
 
-    void EvectBingding::update(sf::Event event) {
+    void EvectBingding::update(const sf::Event &event) {
         // 处理键盘事件
         if (event.type == sf::Event::KeyPressed) {
             if (m_keyBindings.contains(event.key.code)) {
@@ -31,12 +31,11 @@ namespace sfui {
         // 处理按钮点击事件
         if (event.type == sf::Event::MouseButtonPressed) {
             for (const auto &[buttonArea, action]
-                : m_mouseButtonBindings[event.mouseButton.button]) {
+                 : m_mouseButtonBindings[event.mouseButton.button]) {
                 if (buttonArea->isInArea(event.mouseButton.x, event.mouseButton.y)) {
                     action();
                 }
-                }
+            }
         }
-
     }
 }

@@ -16,22 +16,21 @@ namespace sfui {
         m_screenSize.y = desktopMode.height;
 
         m_windowSize = WindowSize(width, height);
-        m_sf_renderWindow.setVerticalSyncEnabled(m_verticalSyncEnabled);
-        m_sf_renderWindow.setFramerateLimit(m_framerateLimit);
         if (windowState == WindowState::Windowed) {
             m_sf_renderWindow.create(sf::VideoMode(width, height), "");
         } else {
             m_sf_renderWindow.create(sf::VideoMode::getDesktopMode(), "", sf::Style::Fullscreen);
         }
+        m_sf_renderWindow.setVerticalSyncEnabled(m_verticalSyncEnabled);
+        m_sf_renderWindow.setFramerateLimit(m_framerateLimit);
     }
 
 
-    bool Window::setFramerate(const int &framerateLimit, const bool &verticalSyncEnabled) {
+    void Window::setFramerate(const int &framerateLimit, const bool &verticalSyncEnabled) {
         m_framerateLimit = framerateLimit;
         m_verticalSyncEnabled = verticalSyncEnabled;
         m_sf_renderWindow.setVerticalSyncEnabled(m_verticalSyncEnabled);
         m_sf_renderWindow.setFramerateLimit(m_framerateLimit);
-        return false;
     }
 
 
@@ -93,12 +92,11 @@ namespace sfui {
 
     void Window::drawFrame() {
         updateView();
+        m_sf_renderWindow.clear(m_pages[m_nowPageTitle]->getBackgroundColor());
         // 更新页面，并把页面的图形加载到窗口
         m_pages[m_nowPageTitle]->updateFrame();
         // 显示当前窗口的画面
         m_sf_renderWindow.display();
-
-        m_sf_renderWindow.clear(m_pages[m_nowPageTitle]->getBackgroundColor());
     }
 
     void Window::requestPageSwitch(const Title &pageTitle) {
@@ -109,6 +107,7 @@ namespace sfui {
             }
         } catch (const std::runtime_error &err) {
             std::wcerr << "Exception: " << pageTitle << err.what() << std::endl;
+            return;
         }
 
         m_nowPageTitle = pageTitle;
@@ -116,7 +115,6 @@ namespace sfui {
         // 初始化界面
         m_pages[m_nowPageTitle]->init();
     }
-
 
 
     sf::RenderWindow &Window::getSfRenderWindow() {

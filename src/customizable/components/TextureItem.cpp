@@ -6,8 +6,8 @@ namespace sfui {
 
 
     TextureItem::TextureItem(TextureItem &&other) noexcept
-        : m_sf_sprite(std::move(other.m_sf_sprite)),
-        m_sf_texture(std::move(other.m_sf_texture)) {
+        : m_sf_texture(std::move(other.m_sf_texture)),
+        m_sf_sprite(std::move(other.m_sf_sprite)) {
 
         m_sf_sprite.setTexture(m_sf_texture);
     }

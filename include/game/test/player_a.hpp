@@ -5,7 +5,8 @@
 #define PLAYER_A_HPP
 #include "bullet.hpp"
 #include "player.hpp"
-#include <SFML/Audio.hpp>
+#include "soundEffect.hpp"
+
 namespace game {
     class PlayerBullet : public Bullet {
     public:
@@ -53,11 +54,9 @@ namespace game {
         Player_a(const float x, const float y, const float hitboxWidth, const float hitboxHeight,
                  const float speed, const double health)
             : Player(x, y, hitboxWidth, hitboxHeight, speed, health), m_noDodgeSpeed(speed) {
-            if (!buffer.loadFromFile("assets/media/a.mp3")) {  // 短音效
-                std::cerr << "加载失败\n";
+            for (int i = 0; i < 10; ++i) {
+                sounds.emplace_back("assets/media/a.mp3");
             }
-            sound.setBuffer(buffer); // 绑定音频数据
-            sound.setVolume(100);     // 音量 0-100
         }
 
         void dodge() {
@@ -86,19 +85,18 @@ namespace game {
                     setSpeed(m_noDodgeSpeed);
                 }
 
-                if (time.elapsed() > 300) {
+                if (time.elapsed() > 100) {
                     time.reset();
                     if (mouse.isLeftPressed()) {
-
-
-
-
-                        sound.play();            // 播放
+                        if (index == sounds.size()) {
+                            index = 0;
+                        }
+                        sounds[index++].play();
                         barrage.addBullet(std::make_unique<PlayerBullet>(
                                 getX(), getY(), 30,
                                 get_angle_radians(getX(), getY(), mouse.getViewPosition().x,
                                                   mouse.getViewPosition().y),
-                                3, 3, 50, boss)
+                                3, 3, 15, boss)
                         );
                     }
                 }
@@ -117,11 +115,8 @@ namespace game {
         sfui::TimeIntervalMs dt;
         float m_dodgeSpeed{87};
         float m_noDodgeSpeed;
-
-
-
-        sf::SoundBuffer buffer;
-        sf::Sound sound;
+        std::vector<sfui::SoundEffect> sounds;
+        std::size_t index{0};
     };
 } // game
 

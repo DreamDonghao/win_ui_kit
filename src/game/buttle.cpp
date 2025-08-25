@@ -62,26 +62,28 @@ namespace game {
     // ReSharper disable once CppMemberFunctionMayBeConst
     double Barrage::dealDamage(const Hitbox &hitbox) {
         double damage = 0;
-        std::for_each(std::execution::par_unseq, m_bullets.begin(), m_bullets.end(),
-                      [& hitbox,&damage](auto &bullet) {
-                          if (isCollide(hitbox, bullet->getHitbox())) {
-                              damage += bullet->getAttack();
-                              bullet->setAlive(false);
-                          }
-                      });
+        std::for_each(
+            std::execution::par_unseq, m_bullets.begin(), m_bullets.end(),
+            [& hitbox,&damage](auto &bullet) {
+                if (isCollide(hitbox, bullet->getHitbox())) {
+                    damage += bullet->getAttack();
+                    bullet->setAlive(false);
+                }
+            }
+        );
         return damage;
     }
 
     void Barrage::run() {
-        for (size_t i = 0; i < m_bullets.size();) {
-            m_bullets[i]->move();
-            if (!m_bullets[i]->isAlive()) {
-                std::swap(m_bullets[i], m_bullets.back());
-                m_bullets.pop_back();
-            } else {
-                ++i;
-            }
-        }
+        std::for_each(
+            std::execution::par_unseq, m_bullets.begin(), m_bullets.end(),
+            [](auto &bullet) {
+                bullet->move();
+            });
+
+        std::erase_if(m_bullets, [](auto &bullet) {
+            return !bullet->isAlive();
+        });
     }
 
     void Barrage::setIsDrawHitbox(const bool drawHitbox) {
@@ -89,12 +91,14 @@ namespace game {
     }
 
     void Barrage::draw(sf::RenderWindow &window) const {
-        std::for_each(std::execution::seq, m_bullets.begin(), m_bullets.end(),
-                      [&](auto &bullet) {
-                          bullet->draw(window);
-                          if (m_isDrawHitbox) {
-                              bullet->drawHitbox(window);
-                          }
-                      });
+        std::for_each(
+            std::execution::seq, m_bullets.begin(), m_bullets.end(),
+            [&](auto &bullet) {
+                bullet->draw(window);
+                if (m_isDrawHitbox) {
+                    bullet->drawHitbox(window);
+                }
+            }
+        );
     }
 }

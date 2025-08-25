@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Window/Event.hpp>
-
 #include <Page.hpp>
 
 namespace sfui {
@@ -73,9 +72,8 @@ namespace sfui {
          * @brief 初始化窗口参数。
          * @param framerateLimit 帧率上限。
          * @param verticalSyncEnabled 是否启用垂直同步。
-         * @return 初始化是否成功。
          */
-        bool setFramerate(const int &framerateLimit, const bool &verticalSyncEnabled);
+        void setFramerate(const int &framerateLimit, const bool &verticalSyncEnabled);
 
         /**
          * @brief 向窗口添加页面。

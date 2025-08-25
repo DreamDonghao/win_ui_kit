@@ -30,6 +30,7 @@ include_directories(
 
         "include/game"
         "include/core/tool"
+        "include/core/audio"
 )
 
 # 添加 SFML 的库文件路径
@@ -68,7 +69,7 @@ add_executable(GAME
         src/game/buttle.cpp
         include/customizable/components/progressBar.hpp
         include/game/test/player_a.hpp
-
+        include/core/audio/soundEffect.hpp
 )
 
 # 链接 SFML 的库

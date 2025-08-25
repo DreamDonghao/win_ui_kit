@@ -46,10 +46,10 @@ namespace game {
             : Page(p_window),
               textBox(400, 300, 100, sf::Color::White,
                       R"(assets/ttf/zh-cn.ttf)",
-                      ""),
+                      L"F11 全屏\n B 开始\n 空格 冲刺"),
               player(-300.f, 0.f, 50.f, 50.f, 5.f, 100),
 
-              boss(1000, 1000, 100, 100, 10000),
+              boss(500, 0, 100, 100, 10000),
               bossUpdate(boss.update(barrage, myBarrage, player)),
               playerUpdate(player.update(m_mouse, myBarrage,barrage,boss)),
               circle(0, 0, 100, sf::Color::White),
@@ -68,6 +68,7 @@ namespace game {
             activeMap(sfui::Key::D, [&]() { player.moveRight(); });
             activeMap(sfui::Key::Space, [&]() { player.dodge(); });
             activeMap(sfui::Key::B, [&]() {
+                textBox.setTestString(L"");
                 timeInterval.reset();
                 isBegin = true;
             });

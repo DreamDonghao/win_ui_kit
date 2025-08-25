@@ -18,6 +18,12 @@ constexpr int ratio = 100;
 
 
 int main() {
+    sf::Music music;
+    music.openFromFile("assets/media/PixelDreams.mp3");
+    music.setPitch(0.5);
+    music.setLoop(true);
+    music.play();
+
     //#define TEST
 
 #ifdef TEST

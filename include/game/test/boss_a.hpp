@@ -23,7 +23,7 @@ namespace game {
                 alwaysActive(barrage, enemyBarrage, player, oldHealth);
 
 
-                switch (randomInt(0, 5)) {
+                switch (randomInt(0, 7)) {
                     case 1:
                         t2.reset();
                         while (t2.elapsed() < 7000) {
@@ -80,10 +80,10 @@ namespace game {
                                 t3.reset();
                                 for (auto &a: abc) {
                                     barrage.addBullet(std::make_unique<Bullet>(
-                                            a.getX(), a.getY(), 10,
-                                            get_angle_radians(a.getX(), a.getY(), player.getX(), player.getY()),
-                                            2, 2, 1)
-                                    );
+                                        a.getX(), a.getY(), 10,
+                                        get_angle_radians(a.getX(), a.getY(), player.getX(), player.getY()),
+                                        2, 2, 1
+                                    ));
                                 }
                             }
                             changeHealth(-enemyBarrage.dealDamage(getHitbox()));
@@ -98,8 +98,10 @@ namespace game {
                             if (t3.elapsed() > 200) {
                                 t3.reset();
                                 for (int i = player.getY() - 1500; i < player.getY() + 1500; i += 250) {
-                                    barrage.addBullet(
-                                        std::make_unique<Bullet>(player.getX() - 1500, i, 10, 0, 2, 2, 1));
+                                    barrage.addBullet(std::make_unique<Bullet>(
+                                        player.getX() - 1500, i, 10, 0,
+                                        2, 2, 1
+                                    ));
                                 }
                             }
                             alwaysActive(barrage, enemyBarrage, player, oldHealth);
@@ -112,8 +114,31 @@ namespace game {
                             if (t3.elapsed() > 200) {
                                 t3.reset();
                                 for (int i = player.getX() - 1500; i <= player.getX() + 1500; i += 250) {
-                                    barrage.addBullet(
-                                        std::make_unique<Bullet>(i, player.getY() - 1500, 10, sfui::PI / 2, 2, 2, 1));
+                                    barrage.addBullet(std::make_unique<Bullet>(
+                                        i, player.getY() - 1500, 10, sfui::PI / 2,
+                                        2, 2, 1
+                                    ));
+                                }
+                            }
+                            alwaysActive(barrage, enemyBarrage, player, oldHealth);
+                            co_await std::suspend_always{};
+                        }
+                        break;
+                    case 6:
+                        t2.reset();
+                        while (t2.elapsed() < 7000) {
+                            if (t3.elapsed() > 200) {
+                                t3.reset();
+
+                                for (const auto &x: {player.getX() - 1000, player.getX(), player.getX() + 1000}) {
+                                    for (const auto &y: {player.getY() - 1000, player.getY(), player.getY() + 1000}) {
+                                        if (!(x == 0 && y == 0)) {
+                                            barrage.addBullet(std::make_unique<Bullet>(
+                                                x, y, 6, get_angle_radians(x, y, player.getX(), player.getY()),
+                                                2, 2, 1
+                                            ));
+                                        }
+                                    }
                                 }
                             }
                             alwaysActive(barrage, enemyBarrage, player, oldHealth);
@@ -154,7 +179,7 @@ namespace game {
 
     private:
         std::vector<sfui::Circle> abc{
-            {getX(), getY(),3, sf::Color::White},
+            {getX(), getY(), 3, sf::Color::White},
             {getX(), getY(), 3, sf::Color::White}
         };
 
