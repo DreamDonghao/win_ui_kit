@@ -24,13 +24,13 @@ namespace sfui {
          * @brief 获取鼠标指针相对于屏幕的位置
          * @return 鼠标屏幕坐标
          */
-        Position getScreenPosition();
+        Position getScreenPosition() const;
 
         /**
          * @brief 获取鼠标指针相对于窗口的位置
          * @return 鼠标窗口坐标
          */
-        Position getWindowPos();
+        Position getWindowPos() const;
 
         /**
          * @brief 获取鼠标指针相对于视图的位置
@@ -42,31 +42,31 @@ namespace sfui {
          * @brief 判断鼠标左键是否按下
          * @return 是否按下
          */
-        bool isLeftPressed();
+        bool isLeftPressed()const;
 
         /**
          * @brief 判断鼠标右键是否按下
          * @return 是否按下
          */
-        bool isRightPressed();
+        bool isRightPressed()const;
 
         /**
          * @brief 判断鼠标中键是否按下
          * @return 是否按下
          */
-        bool isMiddlePressed();
+        bool isMiddlePressed()const;
 
         /**
          * @brief 判断鼠标XButton1是否按下
          * @return 是否按下
          */
-        bool isXButton1Pressed();
+        bool isXButton1Pressed()const;
 
         /**
          * @brief 判断鼠标XButton2是否按下
          * @return 是否按下
          */
-        bool isXButton2Pressed();
+        bool isXButton2Pressed()const;
     private:
         sf::RenderWindow *m_sf_RenderWindow_p = nullptr; ///< 绑定的SFML窗口指针
     };

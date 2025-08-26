@@ -6,7 +6,7 @@ namespace sfui {
 
 
     TextureItem::TextureItem(TextureItem &&other) noexcept
-        : m_sf_texture(std::move(other.m_sf_texture)),
+        : m_sf_texture(other.m_sf_texture),
         m_sf_sprite(std::move(other.m_sf_sprite)) {
 
         m_sf_sprite.setTexture(m_sf_texture);
@@ -16,17 +16,14 @@ namespace sfui {
     TextureItem &TextureItem::operator=(TextureItem &&other) noexcept {
         if (this != &other) {
             m_sf_sprite = std::move(other.m_sf_sprite);
-            m_sf_texture = std::move(other.m_sf_texture);
+            m_sf_texture = other.m_sf_texture;
 
             m_sf_sprite.setTexture(m_sf_texture);
         }
         return *this;
     }
 
-    TextureItem::TextureItem(const TextureItem &other)
-        :m_sf_sprite(other.m_sf_sprite), m_sf_texture(other.m_sf_texture) {
-
-    }
+    TextureItem::TextureItem(const TextureItem &other)= default;
 
 
     bool TextureItem::init(const FilePath &filepath,
@@ -37,8 +34,8 @@ namespace sfui {
         }
         m_sf_sprite.setTexture(m_sf_texture);
         m_sf_sprite.setPosition(x, y);
-        m_sf_sprite.setScale(float(width) / m_sf_texture.getSize().x,
-            float(height) / m_sf_texture.getSize().y);
+        m_sf_sprite.setScale(static_cast<float>(width) / m_sf_texture.getSize().x,
+            static_cast<float>(height) / m_sf_texture.getSize().y);
         return true;
     }
 
@@ -73,11 +70,11 @@ namespace sfui {
         m_sf_sprite.setPosition(x, y);
     }
     //获取显示宽度
-    const float TextureItem::getShowWidth() const {
+    float TextureItem::getShowWidth() const {
         return m_sf_sprite.getGlobalBounds().width;
     }
     //获取显示高度
-    const float TextureItem::getShowHidth() const {
+    float TextureItem::getShowHidth() const {
         return m_sf_sprite.getGlobalBounds().height;
     }
     //获取纹理宽度

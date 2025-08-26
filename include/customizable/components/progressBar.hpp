@@ -13,10 +13,10 @@ namespace sfui {
     public:
         ProgressBar(const float x, const float y, const float width, const float height,
                     const double maxValue, const double currentValue,
-                  const sf::Color backgroundColor  ,const sf::Color barColor)
+                    const sf::Color backgroundColor, const sf::Color barColor)
             : m_x(x), m_y(y), m_width(width), m_height(height),
               m_maxValue(maxValue), m_currentValue(currentValue),
-           m_backgroundColor(backgroundColor) ,  m_barColor(barColor)  {
+              m_backgroundColor(backgroundColor), m_barColor(barColor) {
         }
 
         virtual ~ProgressBar() = default;
@@ -34,6 +34,9 @@ namespace sfui {
                 m_currentValue = currentValue;
             } else {
                 m_currentValue = m_maxValue;
+            }
+            if (m_currentValue < 0) {
+                m_currentValue = 0;
             }
         }
 
@@ -54,15 +57,24 @@ namespace sfui {
         }
 
         virtual void draw(sf::RenderWindow &window) {
-            const Rectangle back(m_x, m_y, m_width, m_height, m_backgroundColor, m_backgroundColor);
-            const double progress = getProgress();
-            const Rectangle bar(
-                m_x - m_width * (1 - progress) / 2, m_y,
-                m_width * progress, m_height,
-                m_barColor,m_barColor
+            const Rectangle back(
+                m_x, m_y,
+                m_width, m_height,
+                m_backgroundColor, m_backgroundColor
             );
+
             back.draw(window);
-            bar.draw(window);
+            if (m_currentValue > 0) {
+                const double progress = getProgress();
+                const Rectangle bar(
+                    m_x - m_width / 2 + (m_width * progress) / 2, // 左端固定，往右延伸
+                    m_y,
+                    m_width * progress, m_height,
+                    m_barColor, m_barColor
+                );
+
+                bar.draw(window);
+            }
         }
 
     private:

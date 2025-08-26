@@ -59,7 +59,7 @@ namespace game {
          * @brief 获取子弹的碰撞箱
          * @return 碰撞箱对象
          */
-        [[nodiscard]] Hitbox getHitbox() const;
+        [[nodiscard]] const Hitbox &getHitbox() const;
 
         /**
          * @brief 获取子弹的攻击力
@@ -83,7 +83,7 @@ namespace game {
          * @brief 绘制子弹
          * @param window 渲染窗口
          */
-        virtual void draw(sf::RenderWindow &window) const;
+        virtual void draw(sf::RenderWindow &window)const  = 0;
 
         /**
          * @brief 绘制子弹的碰撞箱

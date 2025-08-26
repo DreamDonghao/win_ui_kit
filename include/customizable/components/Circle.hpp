@@ -10,37 +10,45 @@
 namespace sfui {
     class Circle {
     public:
+        Circle():Circle(0,0,3,sf::Color::Red){}
+
         Circle(const float x, const float y, const float radius, const sf::Color fillColor)
             : m_x(x), m_y(y), m_radius(radius), m_fillColor(fillColor) {
-            circle.setPosition(x - radius, y - radius);
-            circle.setRadius(radius);
-            circle.setFillColor(fillColor);
+            m_sf_circle.setPosition(x - radius, y - radius);
+            m_sf_circle.setRadius(radius);
+            m_sf_circle.setFillColor(fillColor);
         }
 
         void setPosition(const float x, const float y) {
             m_x = x;
             m_y = y;
-            circle.setPosition(m_x - m_radius , m_y - m_radius );
+            m_sf_circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void setX(const float x) {
             m_x = x;
-            circle.setPosition(m_x - m_radius , m_y - m_radius );
+            m_sf_circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void setY(const float y) {
             m_y = y;
-            circle.setPosition(m_x - m_radius , m_y - m_radius );
+            m_sf_circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void moveX(const float x) {
             m_x += x;
-            circle.setPosition(m_x - m_radius , m_y - m_radius );
+            m_sf_circle.setPosition(m_x - m_radius , m_y - m_radius );
         }
 
         void moveY(const float y) {
             m_y += y;
-            circle.setPosition(m_x - m_radius , m_y - m_radius );
+            m_sf_circle.setPosition(m_x - m_radius , m_y - m_radius );
+        }
+
+        void setRadius(const float radius) {
+            m_radius = radius;
+            m_sf_circle.setRadius(radius);
+            setPosition(m_x, m_y);
         }
 
         float getRadius() const { return m_radius; }
@@ -49,11 +57,11 @@ namespace sfui {
 
 
         void draw(sf::RenderWindow &renderWindow) const {
-            renderWindow.draw(circle);
+            renderWindow.draw(m_sf_circle);
         }
 
     private:
-        sf::CircleShape circle;
+        sf::CircleShape m_sf_circle;
         float m_x;
         float m_y;
         float m_radius;

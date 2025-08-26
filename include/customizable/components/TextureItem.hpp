@@ -63,7 +63,7 @@ namespace sfui {
          * @param width 新宽度
          * @param height 新高度
          */
-        void setShowSize(const int width, const int &height);
+        void setShowSize(int width, const int &height);
 
         /**
          * @brief 设置X坐标
@@ -88,13 +88,13 @@ namespace sfui {
          * @brief 获取显示宽度
          * @return 显示宽度
          */
-        const float getShowWidth() const;
+        float getShowWidth() const;
 
         /**
          * @brief 获取显示高度
          * @return 显示高度
          */
-        const float getShowHidth() const;
+        float getShowHidth() const;
 
         /**
          * @brief 获取纹理宽度
@@ -125,6 +125,10 @@ namespace sfui {
          * @return SFML Sprite对象引用
          */
         const sf::Sprite &getSprite() const;
+
+        void draw(sf::RenderWindow& window) const {
+            window.draw(m_sf_sprite);
+        }
 
     private:
         sf::Texture m_sf_texture; ///< SFML纹理对象

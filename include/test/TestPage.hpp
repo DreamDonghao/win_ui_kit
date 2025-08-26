@@ -12,50 +12,44 @@
 #include <progressBar.hpp>
 
 #include "test/player_a.hpp"
+#include <word.hpp>
 
 namespace game {
     class MainMenuPage : public sfui::Page {
     private:
-        sfui::TextureItem mainPage;
+        Word word;
+
         sfui::TextBox textBox;
-        sf::String str;
-        float angle = 0;
-        game::Player_a player;
-        float playerX{0}, playerY{0};
-        //game::Barrage barrage;
         sfui::TimeIntervalMs timeInterval;
-        sfui::TimeIntervalMs abt;
+
+        game::Player_a player;
         game::Boss_a boss;
         sfui::Task<void> bossUpdate;
         sfui::Task<void> playerUpdate;
-        sfui::Circle circle;
+
         game::Barrage barrage;
         game::Barrage myBarrage;
 
         sfui::ProgressBar bossHealthBar;
         sfui::ProgressBar playerHealthBar;
         sfui::ProgressBar dodgeCooldownTimeBar;
-        sfui::TimeIntervalMs time;
-
-        sfui::TimeIntervalMs t;
 
         bool isBegin{false}, isEnd{false};
 
     public:
         explicit MainMenuPage(sfui::Window *p_window)
-            : Page(p_window),
+            : Page(p_window), word(0, 0),
               textBox(400, 300, 100, sf::Color::White,
                       R"(assets/ttf/zh-cn.ttf)",
-                      L"F11 全屏\n B 开始\n 空格 冲刺"),
-              player(-300.f, 0.f, 50.f, 50.f, 5.f, 100),
+                      L"F11 全屏\n B 开始\n 空格 冲刺\n 数字 切换武器"),
+              player(0, 0.f, 50.f, 50.f, 5.f, 100),
 
               boss(500, 0, 100, 100, 10000),
               bossUpdate(boss.update(barrage, myBarrage, player)),
-              playerUpdate(player.update(m_mouse, myBarrage,barrage,boss)),
-              circle(0, 0, 100, sf::Color::White),
-              bossHealthBar(800, 50, 800, 30, 10000, 10000,sf::Color::White,sf::Color::Red),
-              playerHealthBar(100, 30, 150, 20, 100, 100,sf::Color::White,sf::Color::Red),
-              dodgeCooldownTimeBar(75, 60, 100, 15, 3, 3,sf::Color::White,sf::Color::Blue) {
+              playerUpdate(player.update(m_mouse, myBarrage, barrage, boss)),
+              bossHealthBar(800, 50, 800, 30, 10000, 10000, sf::Color::White, sf::Color::Red),
+              playerHealthBar(100, 30, 150, 20, 100, 100, sf::Color::White, sf::Color::Red),
+              dodgeCooldownTimeBar(75, 60, 100, 15, 3, 3, sf::Color::White, sf::Color::Blue) {
         }
 
         // 初始化界面元素
@@ -72,8 +66,9 @@ namespace game {
                 timeInterval.reset();
                 isBegin = true;
             });
+            activeMap(sfui::Key::Num1, [&]() { player.setNowItemIndex(0); });
+            activeMap(sfui::Key::Num2, [&]() { player.setNowItemIndex(1); });
         }
-
 
 
         void updateByMessage() override {
@@ -82,18 +77,20 @@ namespace game {
 
 
         void update() override {
+            word.load();
+
+            word.setPosition(player.getX() / 32 / 32 - (player.getX() >= 0 ? 0 : 1),
+                             player.getY() / 32 / 32 - (player.getY() >= 0 ? 0 : 1));
             bossHealthBar.setX(static_cast<float>(getSfRenderWindow().getSize().x) / 2);
             dodgeCooldownTimeBar.updateCurrentValue(player.getDodgeCooldownTime());
             playerUpdate.resume();
             barrage.run();
             myBarrage.run();
+            bossHealthBar.updateCurrentValue(boss.getHealth());
+            playerHealthBar.updateCurrentValue(player.getHealth());
             if (isBegin && !isEnd) {
-                bossHealthBar.updateCurrentValue(boss.getHealth());
-                playerHealthBar.updateCurrentValue(player.getHealth());
-
                 boss.turnTo(player.getX(), player.getY());
                 bossUpdate.resume();
-
 
 
                 if (isCollide(player.getHitbox(), boss.getHitbox())) {
@@ -149,18 +146,18 @@ namespace game {
             getSfRenderWindow().draw(lines);
 
 
+            drawForView(
+                word,
+                player,
+                boss,
+                barrage,
+                myBarrage
+            );
             drawForWindow(
                 bossHealthBar,
                 playerHealthBar,
                 dodgeCooldownTimeBar,
                 textBox
-            );
-
-            drawForView(
-                player,
-                boss,
-                barrage,
-                myBarrage
             );
         }
     };

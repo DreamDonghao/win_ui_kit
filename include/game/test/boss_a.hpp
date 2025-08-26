@@ -7,9 +7,29 @@
 #include <Circle.hpp>
 #include <bullet.hpp>
 
+#include "timepiece.hpp"
+
 
 namespace game {
-    class Boss_a : public Boss {
+    class Boss_a final : public Boss {
+        class Bullet_b final : public Bullet {
+        public:
+            Bullet_b(const float x, const float y, const float speed, const float moveAngle,
+                     const float hitboxWidth, const float hitboxHeight, const double attack)
+                : Bullet(x, y, speed, moveAngle, hitboxWidth, hitboxHeight, attack) {
+            }
+
+            ~Bullet_b() override = default;
+
+            void draw(sf::RenderWindow &window)const override {
+                c.setPosition(getX(),getY());
+                c.draw(window);
+            }
+
+        private:
+            mutable sfui::Circle c;
+        };
+
     public:
         Boss_a(const float x, const float y, const float hitboxWidth, const float hitboxHeight, const double health)
             : Boss(x, y, hitboxWidth, hitboxHeight, health) {
@@ -79,7 +99,7 @@ namespace game {
                             if (t3.elapsed() > 100) {
                                 t3.reset();
                                 for (auto &a: abc) {
-                                    barrage.addBullet(std::make_unique<Bullet>(
+                                    barrage.addBullet(std::make_unique<Bullet_b>(
                                         a.getX(), a.getY(), 10,
                                         get_angle_radians(a.getX(), a.getY(), player.getX(), player.getY()),
                                         2, 2, 1
@@ -98,7 +118,7 @@ namespace game {
                             if (t3.elapsed() > 200) {
                                 t3.reset();
                                 for (int i = player.getY() - 1500; i < player.getY() + 1500; i += 250) {
-                                    barrage.addBullet(std::make_unique<Bullet>(
+                                    barrage.addBullet(std::make_unique<Bullet_b>(
                                         player.getX() - 1500, i, 10, 0,
                                         2, 2, 1
                                     ));
@@ -114,7 +134,7 @@ namespace game {
                             if (t3.elapsed() > 200) {
                                 t3.reset();
                                 for (int i = player.getX() - 1500; i <= player.getX() + 1500; i += 250) {
-                                    barrage.addBullet(std::make_unique<Bullet>(
+                                    barrage.addBullet(std::make_unique<Bullet_b>(
                                         i, player.getY() - 1500, 10, sfui::PI / 2,
                                         2, 2, 1
                                     ));
@@ -133,7 +153,7 @@ namespace game {
                                 for (const auto &x: {player.getX() - 1000, player.getX(), player.getX() + 1000}) {
                                     for (const auto &y: {player.getY() - 1000, player.getY(), player.getY() + 1000}) {
                                         if (!(x == 0 && y == 0)) {
-                                            barrage.addBullet(std::make_unique<Bullet>(
+                                            barrage.addBullet(std::make_unique<Bullet_b>(
                                                 x, y, 6, get_angle_radians(x, y, player.getX(), player.getY()),
                                                 2, 2, 1
                                             ));
@@ -163,7 +183,7 @@ namespace game {
 
         void addBullet(Barrage &barrage) const {
             for (auto &a: abc) {
-                barrage.addBullet(std::make_unique<Bullet>(
+                barrage.addBullet(std::make_unique<Bullet_b>(
                         a.getX(), a.getY(), 10, get_angle_radians(getX(), getY(), a.getX(), a.getY()),
                         2, 2, 1)
                 );

@@ -10,10 +10,10 @@ namespace sfui {
     void  Mouse::setWindow(sf::RenderWindow *const p_sfml_RenderWindow) {
         m_sf_RenderWindow_p = p_sfml_RenderWindow;
     }
-    Position  Mouse::getScreenPosition() {
+    Position  Mouse::getScreenPosition() const {
         return sf::Mouse::getPosition();
     }
-    Position  Mouse::getWindowPos() {
+    Position  Mouse::getWindowPos() const {
         return sf::Mouse::getPosition(*m_sf_RenderWindow_p);
     }
     sf::Vector2f  Mouse::getViewPosition() const {
@@ -21,19 +21,19 @@ namespace sfui {
         const sf::Vector2f mousePosView = m_sf_RenderWindow_p->mapPixelToCoords(mousePosWindow);
         return mousePosView;
     }
-    bool Mouse::isLeftPressed() {
+    bool Mouse::isLeftPressed()const {
         return sf::Mouse::isButtonPressed(sf::Mouse::Left);
     }
-    bool Mouse::isRightPressed() {
+    bool Mouse::isRightPressed()const{
         return sf::Mouse::isButtonPressed(sf::Mouse::Right);
     }
-    bool Mouse::isMiddlePressed() {
+    bool Mouse::isMiddlePressed()const {
         return sf::Mouse::isButtonPressed(sf::Mouse::Middle);
     }
-    bool Mouse::isXButton1Pressed() {
+    bool Mouse::isXButton1Pressed()const {
         return sf::Mouse::isButtonPressed(sf::Mouse::XButton1);
     }
-    bool Mouse::isXButton2Pressed() {
+    bool Mouse::isXButton2Pressed()const {
         return sf::Mouse::isButtonPressed(sf::Mouse::XButton2);
     }
 }

@@ -29,7 +29,7 @@ int main() {
 #ifdef TEST
     sfui::Window window(
         width * ratio, heigth * ratio, sfui::WindowState::Windowed,
-        120, false
+        12000, false
     );
     window.addPage(sfui::strToWstr("铁傀儡机"), sfui::makePage<game::TklPage>(&window));
     window.addPage(sfui::strToWstr("主界面"), sfui::makePage<game::MainMenuPage>(&window));

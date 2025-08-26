@@ -70,6 +70,9 @@ add_executable(GAME
         include/customizable/components/progressBar.hpp
         include/game/test/player_a.hpp
         include/core/audio/soundEffect.hpp
+        include/game/item.hpp
+        include/game/test/weapon1.hpp
+        include/game/word.hpp
 )
 
 # 链接 SFML 的库

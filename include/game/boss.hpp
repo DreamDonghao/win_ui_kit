@@ -7,12 +7,15 @@
 #include <co.hpp>
 #include <tool.hpp>
 #include <angle.hpp>
-#include <SFML/Window.hpp>
+
 
 #include "bullet.hpp"
-#include "timepiece.hpp"
+#include "button.hpp"
+#include "Circle.hpp"
+
 
 namespace game {
+
     class Boss {
     public:
         virtual ~Boss() = default;
@@ -63,7 +66,7 @@ namespace game {
             m_health += health;
         }
 
-        virtual sfui::Task<void> update(Barrage &barrage,float &playerX, float &playerY) {
+        virtual sfui::Task<void> update(Barrage &barrage, float &playerX, float &playerY) {
             while (m_health > 0) {
                 while (distance(m_x, m_y, playerX, playerY) < 1000) {
                     move();
@@ -77,8 +80,8 @@ namespace game {
         }
 
         virtual void draw(sf::RenderWindow &window) {
-
         }
+
     private:
         float m_x;
         float m_y;
@@ -87,7 +90,6 @@ namespace game {
         Hitbox m_hitbox;
         double m_health;
         int state{0};
-
     };
 } // game
 

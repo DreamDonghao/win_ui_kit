@@ -140,6 +140,7 @@ namespace sfui {
             beginDrawForWindow();
             auto &window = getSfRenderWindow();
             ((drawObjects.draw(window)), ...);
+            beginDrawForView();
         }
 
         void updateView();

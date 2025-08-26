@@ -7,45 +7,41 @@
 #include "player.hpp"
 #include "soundEffect.hpp"
 
+#include "weapon1.hpp"
+
 namespace game {
-    class PlayerBullet : public Bullet {
+    class Inventory {
     public:
-        PlayerBullet(const float x, const float y, const float speed, const float moveAngle,
-                     const float hitboxWidth, const float hitboxHeight, const double attack, Boss &boss)
-            : Bullet(x, y, speed, moveAngle, hitboxWidth, hitboxHeight, attack), m_boss(boss) {
+        void addItem(std::unique_ptr<Item> &&item) {
+            m_items.emplace_back(std::move(item));
         }
 
-        ~PlayerBullet() override = default;
+        void setNowItemIndex(const size_t index) {
+            m_nowItemIndex = index;
+        }
 
-        void move() override {
-            // 归一化到 (-PI, PI]
-            auto normalize = [](double rad) {
-                while (rad <= -sfui::PI) rad += 2 * sfui::PI;
-                while (rad > sfui::PI) rad -= 2 * sfui::PI;
-                return rad;
-            };
+        [[nodiscard]] Item *getNowItem() const {
+            return m_items[m_nowItemIndex].get();
+        }
 
-            if (distance(m_boss.getX(), m_boss.getY(), getX(), getY()) < 600) {
-                const double angleToBoss = get_angle_radians(getX(), getY(), m_boss.getX(), m_boss.getY());
-                const double current = getMoveAngle().getAngleValue();
-
-                if (const double diff = normalize(angleToBoss - current); diff > 0) {
-                    turnAngle(0.2); // 朝右转
-                } else {
-                    turnAngle(-0.2); // 朝左转
-                }
+        void draw(sf::RenderWindow &window) const {
+            sf::Sprite sprite;
+            sfui::Rectangle a(m_nowItemIndex*210+110,30+100,220,220,sf::Color::Cyan,sf::Color::Cyan);
+            a.draw(window);
+            for (size_t i = 0; i < m_items.size(); ++i) {
+                sprite.setTexture(m_items[i]->getIcon());
+                sprite.setPosition( i * 220 ,30);
+                sprite.setScale(
+                    200 / static_cast<float>(m_items[i]->getIcon().getSize().x),
+                    200 / static_cast<float>(m_items[i]->getIcon().getSize().y)
+                );
+                window.draw(sprite);
             }
-
-            this->Bullet::move();
-        }
-
-        void draw(sf::RenderWindow &window) const override {
-            const sfui::Circle circle(getX(), getY(), 3, sf::Color::Yellow);
-            circle.draw(window);
         }
 
     private:
-        Boss &m_boss;
+        std::vector<std::unique_ptr<Item> > m_items;
+        size_t m_nowItemIndex{0};
     };
 
 
@@ -54,9 +50,12 @@ namespace game {
         Player_a(const float x, const float y, const float hitboxWidth, const float hitboxHeight,
                  const float speed, const double health)
             : Player(x, y, hitboxWidth, hitboxHeight, speed, health), m_noDodgeSpeed(speed) {
-            for (int i = 0; i < 10; ++i) {
-                sounds.emplace_back("assets/media/a.mp3");
-            }
+            m_items.addItem(std::make_unique<Weapon1>("wp1", "assets/images/gun.png"));
+            m_items.addItem(std::make_unique<bow1>("bow1", "assets/images/bow1.png"));
+        }
+
+        void setNowItemIndex(const size_t index) {
+            m_items.setNowItemIndex(index);
         }
 
         void dodge() {
@@ -70,7 +69,7 @@ namespace game {
             return static_cast<double>(dt.elapsed()) / 1000;
         }
 
-        sfui::Task<void> update(sfui::Mouse &mouse, Barrage &barrage, Barrage &enemyBarrage, Boss &boss) {
+        sfui::Task<void> update(const sfui::Mouse &mouse, Barrage &barrage, Barrage &enemyBarrage, Boss &boss) {
             co_await std::suspend_always{};
             sfui::TimeIntervalMs time, t2;
             while (getHealth() > 0) {
@@ -84,22 +83,7 @@ namespace game {
                 if (t2.elapsed() > 50) {
                     setSpeed(m_noDodgeSpeed);
                 }
-
-                if (time.elapsed() > 100) {
-                    time.reset();
-                    if (mouse.isLeftPressed()) {
-                        if (index == sounds.size()) {
-                            index = 0;
-                        }
-                        sounds[index++].play();
-                        barrage.addBullet(std::make_unique<PlayerBullet>(
-                                getX(), getY(), 30,
-                                get_angle_radians(getX(), getY(), mouse.getViewPosition().x,
-                                                  mouse.getViewPosition().y),
-                                3, 3, 15, boss)
-                        );
-                    }
-                }
+                m_items.getNowItem()->use( getX(), getY(), mouse,barrage, boss);
                 co_await std::suspend_always{};
             }
             co_return;
@@ -110,13 +94,18 @@ namespace game {
             c.draw(window);
         }
 
+        const Inventory &getInventory() const {
+            return m_items;
+        }
+
     private:
         bool m_isDodge{false};
         sfui::TimeIntervalMs dt;
         float m_dodgeSpeed{87};
         float m_noDodgeSpeed;
-        std::vector<sfui::SoundEffect> sounds;
-        std::size_t index{0};
+
+
+        Inventory m_items;
     };
 } // game
 

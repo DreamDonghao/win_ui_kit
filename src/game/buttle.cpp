@@ -30,7 +30,7 @@ namespace game {
         return m_y;
     }
 
-    Hitbox Bullet::getHitbox() const {
+    const Hitbox &Bullet::getHitbox() const {
         return m_hitbox;
     }
 
@@ -46,10 +46,11 @@ namespace game {
         return m_isAlive;
     }
 
-    void Bullet::draw(sf::RenderWindow &window) const {
-        const sfui::Circle circle(m_x, m_y, 3, sf::Color::Red);
-        circle.draw(window);
-    }
+    // void Bullet::draw(sf::RenderWindow &window) const {
+    //     std::printf("%s",__FUNCTION__);
+    //     const sfui::Circle circle(m_x, m_y, 3, sf::Color::Red);
+    //     circle.draw(window);
+    // }
 
     void Bullet::drawHitbox(sf::RenderWindow &window) const {
         m_hitbox.draw(window);
@@ -91,6 +92,7 @@ namespace game {
     }
 
     void Barrage::draw(sf::RenderWindow &window) const {
+
         std::for_each(
             std::execution::seq, m_bullets.begin(), m_bullets.end(),
             [&](auto &bullet) {

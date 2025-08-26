@@ -4,7 +4,6 @@
 #ifndef PARTICLEBUILDER_HPP
 #define PARTICLEBUILDER_HPP
 #include <Circle.hpp>
-#include <iostream>
 #include <tool.hpp>
 #include <SFML/Window.hpp>
 #include <timepiece.hpp>
